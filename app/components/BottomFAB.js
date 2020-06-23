@@ -3,6 +3,7 @@ import React, {Component} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {FAB} from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {ShareIcon} from '../constants/icon';
 // import {connect} from 'react-redux';
 
 import {ConnectedTitleModal} from './HeaderTitle';
@@ -42,50 +43,47 @@ export class CreateFAB extends Component {
   }
 }
 
-export class FollowFAB extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isFollowing: false,
-    };
-  }
-
-  onPressFAB() {
-    this.setState({isFollowing: !this.state.isFollowing});
-  }
-
-  componentDidMount() {
-    this.setState({isFollowing: this.props.isFollowing});
-  }
+export class ShareFAB extends Component {
+  state = {};
+  onPressShare = () => {
+    if (this.props.onPress) {
+      this.props.onPress();
+    }
+  };
   render() {
-    const {isFollowing} = this.state;
     return (
-      <View
-        style={{
-          position: 'absolute',
-          bottom: 2,
-          // left: 0,
-          height: 40,
-          margin: 20,
-          // width: '100%',
-          alignItems: 'center',
-        }}>
-        <FAB
-          style={[
-            styles.fabButton,
-            {backgroundColor: isFollowing ? '#DDD' : 'black'},
-          ]}
-          labelStyle={{fontSize: 10}}
-          small
-          label={isFollowing ? 'Following' : 'Follow'}
-          color={'white'}
-          onPress={this.onPressFAB.bind(this)}
-        />
-      </View>
+      <FAB
+        style={[
+          styles.fabButton,
+          {
+            width: 50,
+            height: 50,
+            borderRadius: 30,
+            borderWidth: 1,
+            backgroundColor: 'black',
+            borderColor: 'black',
+          },
+        ]}
+        small
+        icon={props => {
+          return (
+            <ShareIcon
+              size={30}
+              color="white"
+              style={{
+                margin: -10,
+                alignSelf: 'center',
+                alignItems: 'center',
+              }}
+            />
+          );
+        }}
+        color={'white'}
+        onPress={this.onPressShare.bind(this)}
+      />
     );
   }
 }
-
 class BottomFAB extends Component {
   constructor(props) {
     super(props);

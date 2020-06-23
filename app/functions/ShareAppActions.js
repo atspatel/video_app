@@ -1,36 +1,56 @@
 import Share from 'react-native-share';
 import RNFetchBlob from 'react-native-fetch-blob';
 
-export function download_and_share_video(url, source) {
-  RNFetchBlob.config({
-    fileCache: true,
-    appendExt: 'mp4',
-  })
-    .fetch('GET', url, {
-      //some headers ..
+export async function download_and_share_video(
+  url,
+  title,
+  ext_url,
+  updateProgress,
+  onShared,
+) {
+  if (url.endsWith('.mp4')) {
+    RNFetchBlob.config({
+      fileCache: true,
+      appendExt: 'mp4',
     })
-    .then(res => {
-      return res.path();
-    })
-    .then(path => {
-      share_post(`file://${path}`, source, true);
+      .fetch('GET', url, {
+        //some headers ..
+      })
+      .progress((received, total) => {
+        if (updateProgress) {
+          updateProgress(received / total);
+        }
+      })
+      .then(res => {
+        return res.path();
+      })
+      .then(path => {
+        const filepath = `file://${path}`;
+        share_post(filepath, title, ext_url, onShared).then(response => {
+          RNFetchBlob.fs.unlink(filepath);
+          onShared(response);
+        });
+      });
+  } else {
+    share_post(url, title, false, ext_url, onShared).then(response => {
+      onShared(response);
     });
+  }
 }
 
-export function share_post(filepath, source, to_delete) {
-  var message = '';
-  if (source) {
-    message = `Source: ${source} \n Shared Via: Crat News http://bit.ly/CratConn`;
-  } else {
-    message = 'Shared Via: Crat News http://bit.ly/CratConn';
+export async function share_post(filepath, title, ext_url, onShared) {
+  // var message = 'Shared Via: KeyPoints http://bit.ly/CratConn';
+  let message = title ? title : '';
+  console.warn(ext_url);
+  if (ext_url && ext_url.length > 0) {
+    message = `${message}..  To Know More: ${ext_url}`;
   }
-  Share.open({url: filepath, message: message})
+  return Share.open({url: filepath, message: message})
     .then(res => {
-      if (to_delete) {
-        RNFetchBlob.fs.unlink(filepath);
-      }
+      return true;
     })
     .catch(err => {
       err && console.log(err);
+      return false;
     });
 }

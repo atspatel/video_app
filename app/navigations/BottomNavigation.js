@@ -1,8 +1,6 @@
 import React, {Component} from 'react';
-import {View, Text, TouchableOpacity} from 'react-native';
-// import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
+import {View, Text, TouchableOpacity, Keyboard} from 'react-native';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 import HomeTab from '../components/HomeTab';
@@ -42,84 +40,114 @@ class TabIcon extends Component {
   }
 }
 
-function MyTabBar({state, descriptors, navigation}) {
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'flex-end',
-        height: 40,
-        backgroundColor: 'black',
-      }}>
-      {state.routes.map((route, index) => {
-        const {options} = descriptors[route.key];
-        const label =
-          options.tabBarLabel !== undefined
-            ? options.tabBarLabel
-            : options.title !== undefined
-            ? options.title
-            : route.name;
+export class MyTabBar extends Component {
+  state = {
+    isVisible: true,
+  };
 
-        const isFocused = state.index === index;
+  componentDidMount() {
+    this.keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        this.setState({isVisible: false});
+      },
+    );
+    this.keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        this.setState({isVisible: true});
+      },
+    );
+  }
 
-        const onPress = () => {
-          const event = navigation.emit({
-            type: 'tabPress',
-            target: route.key,
-            data: {isRefresh: isFocused},
-          });
-          let params = {};
-          if (route.name === 'ProfileNavigation') {
-            params = {user: 'self'};
+  componentWillUnmount() {
+    this.keyboardDidShowListener.remove();
+    this.keyboardDidHideListener.remove();
+  }
+
+  render() {
+    const {isVisible} = this.state;
+    const {state: navState, descriptors, navigation} = this.props;
+    return isVisible ? (
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'flex-end',
+          height: 50,
+          backgroundColor: 'black',
+        }}>
+        {navState.routes.map((route, index) => {
+          const {options} = descriptors[route.key];
+          const label =
+            options.tabBarLabel !== undefined
+              ? options.tabBarLabel
+              : options.title !== undefined
+              ? options.title
+              : route.name;
+
+          const isFocused = navState.index === index;
+
+          const onPress = () => {
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              data: {isRefresh: isFocused},
+            });
+            let params = {};
+            if (route.name === 'ProfileNavigation') {
+              params = {user: 'self'};
+            }
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name, params);
+            } else if (route.name === 'HomeTab') {
+              navigation.navigate(route.name, params);
+            }
+          };
+
+          const onLongPress = () => {
+            navigation.emit({
+              type: 'tabLongPress',
+              target: route.key,
+            });
+          };
+          if (label == 'Create') {
+            return (
+              <View
+                key={index}
+                style={{alignItems: 'center', marginBottom: 10, flex: 1}}>
+                <CreateFAB />
+              </View>
+            );
+          } else {
+            return (
+              <TouchableOpacity
+                key={index}
+                testID={options.tabBarTestID}
+                onPress={onPress}
+                onLongPress={onLongPress}
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                }}>
+                <TabIcon isFocused={isFocused} name={label} />
+              </TouchableOpacity>
+            );
           }
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name, params);
-          } else if (route.name === 'HomeTab') {
-            navigation.navigate(route.name, params);
-          }
-        };
-
-        const onLongPress = () => {
-          navigation.emit({
-            type: 'tabLongPress',
-            target: route.key,
-          });
-        };
-        if (label == 'Create') {
-          return (
-            <View
-              key={index}
-              style={{alignItems: 'center', marginBottom: 10, flex: 1}}>
-              <CreateFAB />
-            </View>
-          );
-        } else {
-          return (
-            <TouchableOpacity
-              key={index}
-              testID={options.tabBarTestID}
-              onPress={onPress}
-              onLongPress={onLongPress}
-              style={{
-                flex: 1,
-                alignItems: 'center',
-              }}>
-              <TabIcon isFocused={isFocused} name={label} />
-            </TouchableOpacity>
-          );
-        }
-      })}
-    </View>
-  );
+        })}
+      </View>
+    ) : null;
+  }
 }
 
-const Tab = createMaterialTopTabNavigator();
+const Tab = createBottomTabNavigator();
 
 export default class BottomNavigation extends Component {
   render() {
     return (
       <Tab.Navigator
-        tabBarPosition="bottom"
+        tabBarOptions={{
+          keyboardHidesTabBar: true,
+        }}
         swipeEnabled={false}
         tabBar={props => <MyTabBar {...props} />}>
         <Tab.Screen name="HomeTab" component={HomeTab} />

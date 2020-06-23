@@ -12,8 +12,6 @@ import FollowingScreen from '../screens/ProfileScreen/FollowingScreen';
 const InProfileStack = createStackNavigator();
 class InProfileNavigation extends Component {
   render() {
-    const isLoggedIn = this.props.Token ? true : false;
-    const isUserName = this.props.user_name ? true : false;
     return (
       <InProfileStack.Navigator
         // initialRouteName="Profile"

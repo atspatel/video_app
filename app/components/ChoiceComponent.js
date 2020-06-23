@@ -20,6 +20,26 @@ class SelectChoiceChips extends Component {
     }
   }
 
+  renderTitle(title, instruction, icon) {
+    return (
+      <View
+        style={{
+          paddingTop: 10,
+          borderBottomWidth: 2,
+          alignItems: 'center',
+          alignSelf: 'stretch',
+        }}>
+        <Text>
+          <Text style={{fontWeight: 'bold', fontSize: 20}}> {title} </Text>
+          {icon}
+          {instruction ? (
+            <Text style={{fontSize: 10}}>{instruction}</Text>
+          ) : null}
+        </Text>
+      </View>
+    );
+  }
+
   renderSelectedChips(props) {
     const stateKey = this.props.stateKey;
     const chipList = this.props.selected_list ? this.props.selected_list : {};
@@ -77,7 +97,9 @@ class SelectChoiceChips extends Component {
   render() {
     const {
       stateKey,
-      placeholder,
+      title,
+      instruction,
+      icon,
       selected_list,
       options_list,
       onSelectChip,
@@ -85,6 +107,7 @@ class SelectChoiceChips extends Component {
     } = this.props;
     return (
       <View style={styles.container}>
+        {title ? this.renderTitle(title, instruction, icon) : null}
         <View style={[styles.chip_container]}>
           {this.renderSelectedChips()}
           {this.renderChips()}

@@ -28,7 +28,12 @@ class UserPosts extends Component {
     const {qcat, qid} = this.state;
     return qid ? (
       <View style={styles.container}>
-        <VideoThumbnailFeed qcat={qcat} qid={qid} onScroll={onScroll} />
+        <VideoThumbnailFeed
+          qcat={qcat}
+          qid={qid}
+          onScroll={onScroll}
+          show_delete={this.props.user_id === qid ? true : false}
+        />
       </View>
     ) : null;
   }
@@ -43,4 +48,11 @@ const styles = StyleSheet.create({
 });
 
 //make this component available to the app
-export default UserPosts;
+import {connect} from 'react-redux';
+
+const mapStateToProps = state => ({
+  user_id: state.AuthReducer.user_id,
+});
+
+export default connect(mapStateToProps, {})(UserPosts);
+// export default UserPosts;

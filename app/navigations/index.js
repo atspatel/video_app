@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 
 import BottomNavigation from './BottomNavigation';
-import VideoRecorder from '../components/VideoRecorder';
+import CreateVideoNavigation from '../navigations/CreateVideoNavigation';
 import ProfilePage from '../screens/ProfileScreen/ProfilePage';
 import VideoFeedScreen from '../screens/VideoFeedScreen/VideoFeedScreen';
 import Home from '../components/Home';
@@ -25,15 +25,6 @@ class MainAppNavigation extends Component {
         screenOptions={{
           headerShown: false,
           gestureEnabled: false,
-          // headerTitleAlign: 'center',
-          // headerTitleStyle: {
-          //   fontFamily: 'serif',
-          //   height: 30,
-          //   textAlign: 'center',
-          // },
-          // headerStyle: {
-          //   height: 40,
-          // },
         }}>
         {this.state.passed ? null : (
           <Stack.Screen name="HomeScreen" component={Home} />
@@ -53,7 +44,7 @@ class MainAppNavigation extends Component {
           component={TopicScreen}
           initialParams={{}}
         />
-        <Stack.Screen name="CreateScreen" component={VideoRecorder} />
+        <Stack.Screen name="CreateScreen" component={CreateVideoNavigation} />
         <Stack.Screen name="CreatorProfile" component={ProfilePage} />
         <Stack.Screen
           name="VideoFeedScreen"

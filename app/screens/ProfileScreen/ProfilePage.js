@@ -55,6 +55,7 @@ class UserInfo extends Component {
           <ProfilePic
             profile_pic={user_data.profile_pic}
             user_name={user_data.name}
+            isSingleImage={true}
           />
           <TouchableOpacity
             disabled={!isCollapsed}

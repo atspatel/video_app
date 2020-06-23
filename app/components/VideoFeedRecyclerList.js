@@ -1,4 +1,3 @@
-import Carousel from 'react-native-snap-carousel';
 //import liraries
 import React, {Component} from 'react';
 import {
@@ -24,6 +23,9 @@ import {post_follow, get_follow} from '../functions/CreatorApi';
 import {download_and_share_video} from '../functions/ShareAppActions';
 import {showLogInAlert} from '../functions/AuthFunctions';
 
+import {ShareFAB} from './BottomFAB';
+import {DownloadCircularBar} from './VideoCircularProgressBar';
+
 import {RecyclerListView, DataProvider, LayoutProvider} from 'recyclerlistview';
 const ViewTypes = {
   VideoFeedCard: 0,
@@ -32,15 +34,34 @@ const ViewTypes = {
 const {width: winWidth, height: winHeight} = Dimensions.get('window');
 // create a component
 
+class ShareComp extends Component {
+  render() {
+    const {isSharing, progress, onClickShare} = this.props;
+    return (
+      <View style={{position: 'absolute', bottom: 10, left: 10}}>
+        {isSharing ? (
+          <DownloadCircularBar current={progress} total={1} />
+        ) : (
+          <ShareFAB onPress={onClickShare} />
+        )}
+      </View>
+    );
+  }
+}
+
 class VideoFeedRecyclerList extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       current_index: 0,
+      current_post: null,
+      isSharing: false,
+      progress: 0,
       focused: true,
       volume: 0,
       feed_data: [],
+      p: 1,
       user_data: [],
 
       width: winWidth,
@@ -79,6 +100,7 @@ class VideoFeedRecyclerList extends Component {
   setIndex = next_index => {
     const feed_data = this.state.feed_data.map((item, index) => {
       if (index === next_index) {
+        this.setState({current_post: item});
         return Object.assign({}, item, {paused: false});
       } else {
         return Object.assign({}, item, {paused: true});
@@ -135,8 +157,26 @@ class VideoFeedRecyclerList extends Component {
     });
   };
 
-  onClickShare = id => {
-    download_and_share_video();
+  onShared = action => {
+    this.setState({isSharing: false});
+  };
+
+  updateProgess = progress => {
+    this.setState({progress: progress});
+    // console.warn(progress, 'progress');
+  };
+  onClickShare = () => {
+    const {current_post} = this.state;
+    if (current_post) {
+      this.setState({isSharing: true});
+      download_and_share_video(
+        current_post.share_url,
+        current_post.title,
+        current_post.external_urls,
+        this.updateProgess,
+        this.onShared,
+      );
+    }
   };
 
   onClickFollow(action, creator_info) {
@@ -154,6 +194,14 @@ class VideoFeedRecyclerList extends Component {
       }
     });
   }
+  onRefresh = () => {
+    this._refRecyclerListView
+      ? this._refRecyclerListView.scrollToIndex(0)
+      : null;
+    this.setState({feed_data: [], p: 1}, () => {
+      this.getVideoData();
+    });
+  };
 
   componentWillReceiveProps(prevProps) {
     if (this.state.focused) {
@@ -250,21 +298,11 @@ class VideoFeedRecyclerList extends Component {
                 name={'thumb-up'}
                 size={item.liked ? 30 : 25}
                 color={item.liked ? 'lightblue' : 'black'}
-                style={{marginHorizontal: 10}}
+                style={{marginHorizontal: 70}}
               />
               <Text style={{textAlign: 'center', color: 'black'}}>
                 {item.likes}
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <MaterialCommunityIcons
-                onPress={() => this.onClickShare(item.id)}
-                name={'share-variant'}
-                size={30}
-                color={'black'}
-                style={{marginHorizontal: 10}}
-              />
-              {/* <Text style={{textAlign: 'center', color: 'black'}}>100</Text> */}
             </TouchableOpacity>
           </View>
         </View>
@@ -301,15 +339,20 @@ class VideoFeedRecyclerList extends Component {
             //   scrollThrottle={16}
             scrollViewProps={{
               scrollEnabled: false,
-              //   refreshControl: (
-              //     <RefreshControl
-              //       refreshing={this.state.refreshing}
-              //       onRefresh={this.onRefresh}
-              //     />
-              //   ),
+              refreshControl: (
+                <RefreshControl
+                  refreshing={this.state.refreshing}
+                  onRefresh={this.onRefresh}
+                />
+              ),
             }}
           />
         </GestureRecognizer>
+        <ShareComp
+          isSharing={this.state.isSharing}
+          progress={this.state.progress}
+          onClickShare={this.onClickShare}
+        />
       </View>
     ) : (
       <View
@@ -339,7 +382,7 @@ const styles = StyleSheet.create({
     fontFamily: 'serif',
     fontSize: 20,
     lineHeight: 25,
-    maxHeight: 105,
+    maxHeight: 110,
     // textAlign: 'justify',
     overflow: 'hidden',
     color: 'black',

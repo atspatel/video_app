@@ -1,6 +1,6 @@
 //import liraries
 import React, {Component} from 'react';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, Image} from 'react-native';
 import {SingleImage} from 'react-native-zoom-lightbox';
 import {Avatar} from 'react-native-paper';
 
@@ -10,17 +10,27 @@ export class ProfilePic extends Component {
     return a.length == 2 ? `${a[0][0]}${a[1][0]}` : a[0] ? a[0][0] : null;
   }
   render() {
-    const {profile_pic, user_name, size} = this.props;
+    const {profile_pic, user_name, size, isSingleImage} = this.props;
     const img_size = size ? size : 65;
     const radius = img_size / 2;
     return profile_pic ? (
-      <SingleImage
-        uri={profile_pic}
-        style={[
-          styles.image_stretch,
-          {width: img_size, height: img_size, borderRadius: radius},
-        ]}
-      />
+      isSingleImage ? (
+        <SingleImage
+          uri={profile_pic}
+          style={[
+            styles.image_stretch,
+            {width: img_size, height: img_size, borderRadius: radius},
+          ]}
+        />
+      ) : (
+        <Image
+          source={{uri: profile_pic}}
+          style={[
+            styles.image_stretch,
+            {width: img_size, height: img_size, borderRadius: radius},
+          ]}
+        />
+      )
     ) : (
       <Avatar.Text size={size} label={this.get_label(user_name)} />
     );

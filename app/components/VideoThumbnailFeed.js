@@ -7,13 +7,15 @@ import {
   Dimensions,
   TouchableOpacity,
   Image,
+  RefreshControl,
 } from 'react-native';
 import {RecyclerListView, DataProvider, LayoutProvider} from 'recyclerlistview';
 import Entypo from 'react-native-vector-icons/Entypo';
+import {DeleteIcon} from '../constants/icon';
 
 import ProfilePic from './ProfilePic';
 import * as RootNavigation from '../../RootNavigationRef';
-import {get_video_data} from '../functions/VideoFeedApi';
+import {get_video_data, delete_video} from '../functions/VideoFeedApi';
 
 const HEIGHT = 160;
 // create a component
@@ -33,9 +35,11 @@ class UserInfo extends Component {
     RootNavigation.navigate('CreatorProfile', {user: id});
   };
   render() {
-    const {user_info} = this.props;
+    const {user_info, qcat} = this.props;
     return (
-      <TouchableOpacity onPress={() => this.onClickUser(user_info.id)}>
+      <TouchableOpacity
+        onPress={() => this.onClickUser(user_info.id)}
+        disabled={qcat === 'user_post' ? true : false}>
         <View
           style={{
             flexDirection: 'row',
@@ -57,7 +61,7 @@ class UserInfo extends Component {
 
 class VideoThumbnail extends Component {
   render() {
-    const {video_info} = this.props;
+    const {video_info, deletePost, qcat} = this.props;
     return (
       <View style={{height: HEIGHT - 10}}>
         <View style={{flex: 1}}>
@@ -72,7 +76,8 @@ class VideoThumbnail extends Component {
 
             {/* <View style={{width: 20, backgroundColor: '#DDD'}} /> */}
           </View>
-          <View
+          <TouchableOpacity
+            activeOpacity={1}
             style={{
               height: 45,
               //   backgroundColor: '#DDD',xw
@@ -82,7 +87,7 @@ class VideoThumbnail extends Component {
               paddingHorizontal: 10,
               backgroundColor: 'rgba(0, 0, 0, 0.4)',
             }}>
-            <View style={{flexDirection: 'row'}}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Entypo
                 name="eye"
                 size={25}
@@ -97,9 +102,23 @@ class VideoThumbnail extends Component {
                 style={{alignSelf: 'center', width: 30, marginLeft: 10}}
               />
               <Text style={{color: 'white'}}>{video_info.shared}</Text>
+              {deletePost ? (
+                <DeleteIcon
+                  size={35}
+                  color="white"
+                  style={{
+                    marginLeft: 10,
+                    // backgroundColor: 'white',
+                    // borderRadius: 20,
+                  }}
+                  onPress={() => {
+                    deletePost(video_info);
+                  }}
+                />
+              ) : null}
             </View>
-            <UserInfo user_info={video_info.user} />
-          </View>
+            <UserInfo user_info={video_info.user} qcat={qcat} />
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -111,15 +130,38 @@ class VideoThumbnailFeed extends Component {
     qcat: null,
     qid: null,
     data_list: null,
+    refreshing: false,
+  };
+
+  deletePost = video_info => {
+    delete_video(video_info.id).then(response => {
+      if (response.status) {
+        const data_list = this.state.data_list.filter(
+          item => item.id !== response.id,
+        );
+        this.setState({data_list: data_list});
+      }
+    });
   };
 
   get_video_data() {
+    this.setState({refreshing: true});
     get_video_data(this.state.qcat, this.state.qid).then(response => {
+      this.setState({refreshing: false});
       if (response.status) {
         this.setState({data_list: response.data});
       }
     });
   }
+
+  onRefresh = () => {
+    this._refRecyclerListView
+      ? this._refRecyclerListView.scrollToIndex(0)
+      : null;
+    this.setState({data_list: [], p: 1}, () => {
+      this.get_video_data();
+    });
+  };
   componentDidUpdate() {
     const {qcat, qid} = this.props;
     if ((qcat && this.state.qcat != qcat) || (qid && this.state.qid != qid)) {
@@ -164,13 +206,17 @@ class VideoThumbnailFeed extends Component {
               index: index,
             });
           }}>
-          <VideoThumbnail video_info={data} />
+          <VideoThumbnail
+            video_info={data}
+            deletePost={this.props.show_delete ? this.deletePost : null}
+            qcat={this.state.qcat}
+          />
         </TouchableOpacity>
       </View>
     );
   }
   render() {
-    const {onScroll} = this.props;
+    const {onScroll, show_delete} = this.props;
     let {data_list} = this.state;
     // data_list = data_list ? data_list : [];
     return data_list ? (
@@ -185,13 +231,17 @@ class VideoThumbnailFeed extends Component {
             }
             onScroll={onScroll ? onScroll : null}
             scrollThrottle={16}
+            scrollViewProps={{
+              refreshControl: (
+                <RefreshControl
+                  refreshing={this.state.refreshing}
+                  onRefresh={this.onRefresh}
+                />
+              ),
+            }}
           />
         </View>
-      ) : (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <Text>No Posts</Text>
-        </View>
-      )
+      ) : null
     ) : null;
   }
 }

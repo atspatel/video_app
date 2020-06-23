@@ -34,15 +34,15 @@ class SelectLangCat extends Component {
         this.props[key].selected_list,
         this.props[key].options_list,
       )
-      .then(output =>
+      .then(output => {
         this.props.updateList
           ? this.props.updateList(
               key,
               output.selected_list,
               output.options_list,
             )
-          : null,
-      );
+          : null;
+      });
   };
   onSelectChip = (key, item) => {
     chipHelperFun
@@ -78,25 +78,17 @@ class SelectLangCat extends Component {
       </View>
     );
   }
-  renderTitle(title, instruction, icon) {
-    return (
-      <View
-        style={{
-          paddingTop: 10,
-          borderBottomWidth: 2,
-          alignItems: 'center',
-          alignSelf: 'stretch',
-        }}>
-        <Text>
-          <Text style={{fontWeight: 'bold', fontSize: 20}}> {title} </Text>
-          {icon}
-          <Text style={{fontSize: 10}}>{instruction}</Text>
-        </Text>
-      </View>
-    );
-  }
   render() {
-    const {title, languages, categories, show_icon, style} = this.props;
+    let {
+      title,
+      languages,
+      categories,
+      show_icon,
+      style,
+      show_instruction,
+    } = this.props;
+    const isLanguage = languages ? true : false;
+    const isCategory = categories ? true : false;
     return (
       <View
         style={[
@@ -110,32 +102,36 @@ class SelectLangCat extends Component {
           style,
         ]}>
         {title ? this.renderMainTitle(title) : null}
-        {this.renderTitle(
-          'Select Languages',
-          '(Min 1)',
-          show_icon ? LANGUAGE_ICON : null,
-        )}
-        <SelectChoiceChips
-          stateKey="languages"
-          selected_list={languages.selected_list}
-          options_list={languages.options_list}
-          onCloseChip={this.onCloseChip}
-          onSelectChip={this.onSelectChip}
-          editable={false}
-        />
-        {this.renderTitle(
-          'Select Categories',
-          '(Max 4)',
-          show_icon ? CATEGORY_ICON : null,
-        )}
-        <SelectChoiceChips
-          stateKey="categories"
-          selected_list={categories.selected_list}
-          options_list={categories.options_list}
-          onCloseChip={this.onCloseChip}
-          onSelectChip={this.onSelectChip}
-          editable={false}
-        />
+        {isLanguage ? (
+          <View>
+            <SelectChoiceChips
+              title={'Select Languages'}
+              instruction={show_instruction ? '(Min 1)' : null}
+              icon={show_icon ? LANGUAGE_ICON : null}
+              stateKey="languages"
+              selected_list={languages.selected_list}
+              options_list={languages.options_list}
+              onCloseChip={this.onCloseChip}
+              onSelectChip={this.onSelectChip}
+              editable={false}
+            />
+          </View>
+        ) : null}
+        {isCategory ? (
+          <View>
+            <SelectChoiceChips
+              title={'Select Categories'}
+              instruction={show_instruction ? '(Max 4)' : null}
+              icon={show_icon ? CATEGORY_ICON : null}
+              stateKey="categories"
+              selected_list={categories.selected_list}
+              options_list={categories.options_list}
+              onCloseChip={this.onCloseChip}
+              onSelectChip={this.onSelectChip}
+              editable={false}
+            />
+          </View>
+        ) : null}
       </View>
     );
   }

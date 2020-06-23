@@ -45,3 +45,15 @@ export async function post_video_reshare(video_id) {
     .catch(error => console.error(error));
   return output;
 }
+
+export async function delete_video(video_id) {
+  var output = null;
+  let api_url = `${host}/keypoints/video_feed/${video_id}/`;
+  await axios
+    .delete(api_url)
+    .then(response => {
+      output = response.data;
+    })
+    .catch(error => console.error(error));
+  return output;
+}

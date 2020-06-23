@@ -328,6 +328,7 @@ class SettingScreen extends Component {
           />
           <SelectLangCat
             title={'Your Expertise'}
+            show_instruction={true}
             languages={this.state.languages}
             categories={this.state.categories}
             updateList={this.updateList}

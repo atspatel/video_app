@@ -100,23 +100,13 @@ export class HomeNavigation extends Component {
             setRoute: this.set_active_route,
           }}
         />
-        <HomeTab.Screen
+        {/* <HomeTab.Screen
           name="Topics"
           component={TopicStackNavigator}
           initialParams={{
             setRoute: this.set_active_route,
           }}
-          // options={({route, navigation}) => ({
-          //   headerTitle: props => (
-          //     <TopicTitle
-          //       title={
-          //         route.params.category ? route.params.category.name : 'Home'
-          //       }
-          //       navigation={navigation}
-          //     />
-          //   ),
-          // })}
-        />
+        /> */}
       </HomeTab.Navigator>
     );
   }

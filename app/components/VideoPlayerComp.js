@@ -125,6 +125,7 @@ class VideoPlayerComp extends Component {
           width: winWidth,
           height: height - 50,
         }}
+        onError={e => console.log(e)}
       />
     );
   }

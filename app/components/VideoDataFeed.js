@@ -21,6 +21,7 @@ import {
 import {post_follow, get_follow} from '../functions/CreatorApi';
 import {download_and_share_video} from '../functions/ShareAppActions';
 import {showLogInAlert} from '../functions/AuthFunctions';
+import * as RootNavigationRef from '../../RootNavigationRef';
 
 import {RecyclerListView, DataProvider, LayoutProvider} from 'recyclerlistview';
 const ViewTypes = {
@@ -64,7 +65,7 @@ class VideoDataFeed extends Component {
       switch (type) {
         case ViewTypes.VideoFeedCard:
           dim.width = this.state.width;
-          dim.height = this.state.height;
+          dim.height = this.state.height - 20;
           break;
         default:
           dim.width = 0;
@@ -107,7 +108,7 @@ class VideoDataFeed extends Component {
   };
 
   onClickUser = user_info => {
-    this.props.navigation.navigate('CreatorProfile', {user: user_info.id});
+    RootNavigationRef.navigate('CreatorProfile', {user: user_info.id});
   };
 
   onClickLike = (id, action) => {
@@ -132,8 +133,8 @@ class VideoDataFeed extends Component {
     });
   };
 
-  onClickShare = id => {
-    download_and_share_video();
+  onClickShare = video_info => {
+    download_and_share_video(video_info.share_url, null);
   };
 
   onClickFollow(action, creator_info) {
@@ -162,15 +163,19 @@ class VideoDataFeed extends Component {
   //     }
   //   }
 
-  componentDidUpdate() {
-    const {feed_data, index} = this.props;
-    if (feed_data && this.state.feed_data != feed_data) {
-      this.setState({feed_data: feed_data, current_index: index ? index : 0});
-    }
-  }
+  componentDidUpdate() {}
 
   componentDidMount() {
-    this.componentDidUpdate();
+    const {feed_data, index} = this.props;
+    if (feed_data && this.state.feed_data != feed_data) {
+      this.setState(
+        {
+          feed_data: feed_data,
+          current_index: index ? index : 0,
+        },
+        () => this.setIndex(this.state.current_index),
+      );
+    }
   }
 
   componentWillUnmount() {}
@@ -179,14 +184,16 @@ class VideoDataFeed extends Component {
     return (
       <View
         style={{
-          height: this.state.height,
+          height: this.state.height - 30,
           width: this.state.width,
+          alignItems: 'center',
         }}>
         <VideoPlayerComp
           video_info={item}
           paused={item.paused}
           onEnd={this.goNext}
           height={0.7 * winHeight}
+          width={winWidth}
           onClickUser={this.onClickUser}
           onClickFollow={this.onClickFollow}
         />
@@ -235,7 +242,7 @@ class VideoDataFeed extends Component {
             </TouchableOpacity>
             <TouchableOpacity>
               <MaterialCommunityIcons
-                onPress={() => this.onClickShare(item.id)}
+                onPress={() => this.onClickShare(item)}
                 name={'share-variant'}
                 size={30}
                 color={'black'}
@@ -257,7 +264,7 @@ class VideoDataFeed extends Component {
     return feed_data.length > 0 ? (
       <View
         style={{
-          height: this.state.height,
+          height: this.state.height - 20,
           width: this.state.width,
           backgroundColor: 'white',
         }}>

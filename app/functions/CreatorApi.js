@@ -1,3 +1,4 @@
+import * as Actions from '../functions/ActionTypes';
 import * as myConfig from '../../config';
 import axios from 'axios';
 
@@ -57,3 +58,17 @@ export async function getUserData(user_id) {
     .catch(error => console.error(error));
   return output;
 }
+
+export const updateFollowMapping = (qid, is_followed) => dispatch => {
+  dispatch({
+    type: Actions.UPDATE_FOLLOW_MAPPING,
+    qid: qid,
+    is_followed: is_followed,
+  });
+};
+
+export const clearFollowMapping = () => dispatch => {
+  dispatch({
+    type: Actions.CLEAR_FOLLOW_MAPPING,
+  });
+};

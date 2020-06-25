@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {AppState} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 
 import BottomNavigation from './BottomNavigation';
@@ -14,6 +15,10 @@ class MainAppNavigation extends Component {
   state = {
     passed: false,
   };
+
+  componentWillUnmount() {
+    this.props.clearFollowMapping();
+  }
 
   componentDidMount = () => {
     setTimeout(() => this.setState({passed: true}), 2000);
@@ -56,4 +61,9 @@ class MainAppNavigation extends Component {
   }
 }
 
-export default MainAppNavigation;
+import {connect} from 'react-redux';
+import {clearFollowMapping} from '../functions/CreatorApi';
+
+export default connect(null, {clearFollowMapping})(MainAppNavigation);
+
+// export default MainAppNavigation;

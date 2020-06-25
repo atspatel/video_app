@@ -8,7 +8,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import {Chip} from 'react-native-paper';
 import Collapsible from 'react-native-collapsible';
 
-import FollowButton from '../../components//FollowButton';
+import FollowButton from '../../components//FollowButtonTwo';
 import ProfilePic from '../../components/ProfilePic';
 import UserVideoTabBar from '../../navigations/UserVideoTabBar';
 
@@ -147,9 +147,11 @@ class FollowInfo extends Component {
           </Text>
         </TouchableOpacity>
         <FollowButton
-          isFollowed={user_data.follow_status == 'follow' ? true : false}
+          qcat={'user'}
+          qid={user_data.id}
+          // isFollowed={user_data.follow_status == 'follow' ? true : false}
           isSelf={user_data.follow_status == 'self' ? true : false}
-          onFollow={action => console.warn(action, user_data.id)}
+          // onFollow={action => console.warn(action, user_data.id)}
         />
       </View>
     );

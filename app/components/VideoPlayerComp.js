@@ -13,7 +13,7 @@ import {
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {AnimatedCircularProgress} from 'react-native-circular-progress';
-import FollowButton from './FollowButton';
+import FollowButton from './FollowButtonTwo';
 import ProfilePic from './ProfilePic';
 import {setVolume} from '../functions/SystemFunctions';
 
@@ -257,14 +257,10 @@ class VideoPlayerComp extends Component {
                 </Text>
                 <FollowButton
                   style={{width: 80}}
-                  isFollowed={
-                    video_info.user.follow_status == 'follow' ? true : false
-                  }
+                  qid={video_info.user.id}
+                  qcat={'user'}
                   isSelf={
                     video_info.user.follow_status == 'self' ? true : false
-                  }
-                  onFollow={action =>
-                    this.onClickFollow(action, video_info.user)
                   }
                 />
                 {/* <FontAwesome5 name="users" size={15} color={'black'} /> */}

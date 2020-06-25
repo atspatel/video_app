@@ -17,5 +17,9 @@ export const CLEAR_VIDEO_LIST = 'CLEAR_VIDEO_LIST';
 export const SET_CATEGORY = 'SET_CATEGORY';
 export const SET_CATEGORY_OPTIONS = 'SET_CATEGORY_OPTIONS';
 
+// FollowActions:
+export const UPDATE_FOLLOW_MAPPING = 'UPDATE_FOLLOW_MAPPING';
+export const CLEAR_FOLLOW_MAPPING = 'CLEAR_FOLLOW_MAPPING';
+
 // SystemActions
 export const SET_VOLUME = 'SET_VOLUME';

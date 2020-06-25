@@ -4,7 +4,7 @@ import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import {RecyclerListView, DataProvider, LayoutProvider} from 'recyclerlistview';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import FollowButton from './FollowButton';
+import FollowButton from './FollowButtonTwo';
 import ProfilePic from './ProfilePic';
 import {get_creator_data, post_follow} from '../functions/CreatorApi';
 const HEIGHT = 160;
@@ -48,9 +48,11 @@ class SourceCard extends Component {
           {source_info.followers} followers
         </Text>
         <FollowButton
-          isFollowed={source_info.follow_status == 'follow' ? true : false}
+          qid={source_info.id}
+          qcat={'user'}
+          // isFollowed={source_info.follow_status == 'follow' ? true : false}
           isSelf={source_info.follow_status == 'self' ? true : false}
-          onFollow={action => onPressFollow(action, source_info)}
+          // onFollow={action => onPressFollow(action, source_info)}
         />
       </View>
     );

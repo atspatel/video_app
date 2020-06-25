@@ -50,3 +50,25 @@ export async function get_options(isTopic) {
   });
   return output;
 }
+
+export async function get_preferences() {
+  let output = null;
+  let api_url = `${host}/keypoints/get_preferences/`;
+  await axios.get(api_url).then(response => {
+    output = response.data;
+  });
+  return output;
+}
+
+export async function post_preferences(languages, categories) {
+  let output = null;
+  const data = {
+    languages: JSON.stringify(languages),
+    categories: JSON.stringify(categories),
+  };
+  let api_url = `${host}/keypoints/get_preferences/`;
+  await axios.post(api_url, data).then(response => {
+    output = response.data;
+  });
+  return output;
+}

@@ -264,6 +264,7 @@ class LogIn extends Component {
         </View>
         <View style={{height: 50}}></View>
         <Snackbar
+          style={{alignSelf: 'center'}}
           visible={this.state.snackbar.visible}
           onDismiss={() => this.close_snackbar()}
           action={{

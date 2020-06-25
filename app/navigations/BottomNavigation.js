@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {View, Text, TouchableOpacity, Keyboard} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 import HomeTab from '../components/HomeTab';
@@ -139,12 +140,14 @@ export class MyTabBar extends Component {
   }
 }
 
-const Tab = createBottomTabNavigator();
+const Tab = createMaterialTopTabNavigator();
 
 export default class BottomNavigation extends Component {
   render() {
     return (
       <Tab.Navigator
+        tabBarPosition="bottom"
+        swipeEnabled={false}
         tabBarOptions={{
           keyboardHidesTabBar: true,
         }}

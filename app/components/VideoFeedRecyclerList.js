@@ -17,9 +17,8 @@ import HashTag from './HashTag';
 import {
   get_video_data,
   post_video_like,
-  post_video_reshare,
+  // post_video_reshare,
 } from '../functions/VideoFeedApi';
-import {post_follow, get_follow} from '../functions/CreatorApi';
 import {download_and_share_video} from '../functions/ShareAppActions';
 import {showLogInAlert} from '../functions/AuthFunctions';
 
@@ -179,11 +178,6 @@ class VideoFeedRecyclerList extends Component {
     }
   };
 
-  onClickFollow(action, creator_info) {
-    post_follow('creator', action, creator_info.id);
-    // get_follow('creator', creator_info.id);
-  }
-
   getVideoData() {
     get_video_data('category', this.state.category.id).then(response => {
       if (response.status) {
@@ -259,7 +253,6 @@ class VideoFeedRecyclerList extends Component {
           onEnd={this.goNext}
           height={0.7 * winHeight}
           onClickUser={this.onClickUser}
-          onClickFollow={this.onClickFollow}
         />
         <View style={styles.video_title}>
           <View style={{flex: 1}}>

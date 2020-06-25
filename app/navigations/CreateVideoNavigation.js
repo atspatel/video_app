@@ -14,8 +14,16 @@ class CreateVideoNavigation extends Component {
     this.props.clearVideoList();
   }
 
+  componentDidMount() {
+    const isLoggedIn = this.props.Token ? true : false;
+    if (!isLoggedIn) {
+      this.props.navigation.navigate('ProfileNavigation');
+    }
+  }
+
   render() {
-    return (
+    const isLoggedIn = this.props.Token ? true : false;
+    return isLoggedIn ? (
       <CreateVideoStack.Navigator
         initialRouteName="VideoRecorder"
         screenOptions={{
@@ -37,7 +45,7 @@ class CreateVideoNavigation extends Component {
           initialParams={{}}
         />
       </CreateVideoStack.Navigator>
-    );
+    ) : null;
   }
 }
 
@@ -46,6 +54,7 @@ import {connect} from 'react-redux';
 import {clearVideoList} from '../functions/CreateVideoFunctions';
 const mapStateToProps = state => ({
   video_list: state.CreateVideoReducer.video_list,
+  Token: state.AuthReducer.Token,
 });
 
 export default connect(mapStateToProps, {clearVideoList})(

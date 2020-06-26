@@ -15,7 +15,9 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {AnimatedCircularProgress} from 'react-native-circular-progress';
 import FollowButton from './FollowButtonTwo';
 import ProfilePic from './ProfilePic';
+import WebViewer from '../screens/WebViewer';
 import {setVolume} from '../functions/SystemFunctions';
+import * as RootNavigationRef from '../../RootNavigationRef';
 
 import * as config from '../../config';
 
@@ -31,9 +33,16 @@ class VideoPlayerComp extends Component {
       duration: 0,
       current: 0,
       isBuffering: false,
+
+      displayUrl: null,
+      showButton: false,
     };
 
     this.toggle_pause = this.toggle_pause.bind();
+  }
+
+  openURL(url) {
+    RootNavigationRef.navigate('WebViewer', {url: url});
   }
 
   onEnd = () => {
@@ -97,15 +106,29 @@ class VideoPlayerComp extends Component {
   //   this.player.seek(parseInt(curr));
   // };
   componentDidUpdate(prevProps) {
+    const {duration, current, showButton, displayUrl} = this.state;
+    if (duration && duration - current < 15 && !showButton && displayUrl) {
+      this.setState({showButton: true});
+    }
+    if (duration && duration - current > 15 && showButton) {
+      this.setState({showButton: false});
+    }
     if (prevProps.paused !== this.props.paused) {
-      this.setState({paused: this.props.paused});
+      this.setState({paused: this.props.paused}, () => {
+        this.props.video_info.source != 'youtube' && this.player.seek(0);
+      });
     }
     if (this.state.volume != this.props.volume) {
       this.setState({volume: this.props.volume});
     }
   }
   componentDidMount() {
-    this.setState({paused: this.props.paused, volume: this.props.volume});
+    const displayUrl = this.props.video_info.external_urls;
+    this.setState({
+      paused: this.props.paused,
+      volume: this.props.volume,
+      displayUrl: displayUrl,
+    });
   }
 
   renderYTPlayer() {
@@ -131,7 +154,7 @@ class VideoPlayerComp extends Component {
   }
   renderVideoPlayer() {
     const {video_info, height} = this.props;
-    const {paused, volume} = this.state;
+    const {paused, showButton, displayUrl, volume} = this.state;
     return (
       <TouchableOpacity onPress={this.toggle_pause} activeOpacity={0.9}>
         <Video
@@ -142,6 +165,8 @@ class VideoPlayerComp extends Component {
           onLoad={this.handleOnLoad}
           progressUpdateInterval={500.0}
           onProgress={this.handleProgress}
+          poster={video_info.thumbnail_image}
+          posterResizeMode={'stretch'}
           style={{
             width: winWidth,
             height: height,
@@ -158,19 +183,36 @@ class VideoPlayerComp extends Component {
             <MaterialCommunityIcons name={'play'} color="white" size={100} />
           </View>
         ) : null}
+        {showButton ? (
+          <View style={styles.overlay_button}>
+            <TouchableOpacity
+              style={{
+                backgroundColor: '#DDD',
+                padding: 5,
+                paddingHorizontal: 20,
+                borderRadius: 10,
+              }}
+              onPress={() => {
+                this.openURL(displayUrl);
+              }}>
+              <Text style={{fontSize: 20, fontFamily: 'serif'}}>
+                Watch More Here
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
       </TouchableOpacity>
     );
   }
   render() {
     const {video_info, paused, onEnd, height} = this.props;
     const isYouTube = video_info.source === 'youtube' ? true : false;
-    const {volume} = this.state;
+    const {volume, displayUrl} = this.state;
     return (
       <View style={[styles.container, {height: height}]}>
         {isYouTube && !paused
           ? this.renderYTPlayer()
           : this.renderVideoPlayer()}
-
         <View style={styles.overlay_bar}>
           <View style={{flex: 1, justifyContent: 'center'}}>
             {isYouTube ? null : (
@@ -302,6 +344,18 @@ const styles = StyleSheet.create({
     width: '100%',
 
     top: 0,
+    left: 0,
+
+    justifyContent: 'center',
+    alignItems: 'center',
+    opacity: 0.8,
+  },
+  overlay_button: {
+    position: 'absolute',
+    height: 50,
+    width: '100%',
+
+    bottom: 60,
     left: 0,
 
     justifyContent: 'center',

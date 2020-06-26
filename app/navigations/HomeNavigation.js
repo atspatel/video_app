@@ -17,15 +17,6 @@ class TopicStackNavigator extends Component {
         screenOptions={{
           headerShown: false,
           gestureEnabled: false,
-          // headerTitleAlign: 'center',
-          // headerTitleStyle: {
-          //   fontFamily: 'serif',
-          //   height: 30,
-          //   textAlign: 'center',
-          // },
-          // headerStyle: {
-          //   height: 40,
-          // },
         }}>
         <TopicStack.Screen
           name="TopicFeed"
@@ -33,16 +24,6 @@ class TopicStackNavigator extends Component {
           initialParams={{
             setRoute: setRoute,
           }}
-          // options={({route, navigation}) => ({
-          //   headerTitle: props => (
-          //     <TopicTitle
-          //       title={
-          //         route.params.category ? route.params.category.name : 'Home'
-          //       }
-          //       navigation={navigation}
-          //     />
-          //   ),
-          // })}
         />
         <TopicStack.Screen
           name="TopicVideoFeed"

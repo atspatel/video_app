@@ -187,8 +187,8 @@ class VideoEditor extends Component {
         url,
         this.updateVideoList,
       );
+      this.props.navigation.navigate('VideoDraft');
     }
-    this.props.navigation.navigate('VideoDraft');
   };
   onChangeTitle = text => {
     // console.warn(text);
@@ -355,9 +355,10 @@ class VideoEditor extends Component {
             justifyContent: 'space-between',
             marginHorizontal: 10,
           }}>
-          <TouchableOpacity onPress={this.addHashtag}>
+          {/* <TouchableOpacity onPress={this.addHashtag}>
             <Text style={styles.hlink}>Add #Tags</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+          <View></View>
           <TouchableOpacity onPress={this.onPost}>
             <Text style={styles.button}>Post</Text>
           </TouchableOpacity>

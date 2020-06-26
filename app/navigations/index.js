@@ -6,6 +6,7 @@ import BottomNavigation from './BottomNavigation';
 import CreateVideoNavigation from '../navigations/CreateVideoNavigation';
 import ProfilePage from '../screens/ProfileScreen/ProfilePage';
 import VideoFeedScreen from '../screens/VideoFeedScreen/VideoFeedScreen';
+import WebViewer from '../screens/WebViewer';
 import Home from '../components/Home';
 import {HashtagScreen, TopicScreen} from '../screens/FeedScreen';
 
@@ -55,6 +56,12 @@ class MainAppNavigation extends Component {
           name="VideoFeedScreen"
           component={VideoFeedScreen}
           initialParams={{}}
+        />
+        <Stack.Screen
+          name="WebViewer"
+          component={WebViewer}
+          initialParams={{}}
+          options={{headerShown: true, title: 'KeyPoints'}}
         />
       </Stack.Navigator>
     );

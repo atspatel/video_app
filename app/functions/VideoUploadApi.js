@@ -1,5 +1,6 @@
 import Upload from 'react-native-background-upload';
 import uuid from 'react-native-uuid';
+import RNFetchBlob from 'react-native-fetch-blob';
 import * as Actions from './ActionTypes';
 
 import axios from 'axios';
@@ -39,13 +40,17 @@ export const upload_video_data = (
   categories,
   url_info,
 ) => dispatch => {
+  dispatch({
+    type: Actions.DELETE_VIDEO_DATA,
+    video_data: video_info,
+  });
   upload_thumbnail(video_info.thumbnail_path).then(response => {
     if (response.status) {
       const thumbnail_image = response.image_url;
       const session_id = uuid.v4();
       const options = {
         url: `${host}/keypoints/upload_video/`,
-        path: video_info.path,
+        path: video_info.filePath,
         method: 'POST',
         type: 'multipart',
         field: 'video_file',
@@ -102,10 +107,11 @@ export const upload_video_data = (
                 ],
                 {cancelable: false},
               );
-              dispatch({
-                type: Actions.DELETE_VIDEO_DATA,
-                video_data: video_info,
-              });
+              if (video_info.method === 'captured') {
+                RNFetchBlob.fs.unlink(video_info.filePath);
+                RNFetchBlob.fs.unlink(video_info.uri.replace('file://', ''));
+                RNFetchBlob.fs.unlink(video_info.thumbnail_path);
+              }
             } else {
               Alert.alert(
                 response.message,
@@ -123,6 +129,10 @@ export const upload_video_data = (
                 ],
                 {cancelable: false},
               );
+              dispatch({
+                type: Actions.ADD_VIDEO_DATA,
+                video_data: video_info,
+              });
             }
           });
         })

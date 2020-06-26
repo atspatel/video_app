@@ -10,6 +10,7 @@ export const SET_SEARCH_TEXT = 'SET_SEARCH_TEXT';
 
 // CreateVideoActions
 export const SET_VIDEO_LIST = 'SET_VIDEO_LIST';
+export const ADD_VIDEO_DATA = 'ADD_VIDEO_DATA';
 export const DELETE_VIDEO_DATA = 'DELETE_VIDEO_DATA';
 export const CLEAR_VIDEO_LIST = 'CLEAR_VIDEO_LIST';
 

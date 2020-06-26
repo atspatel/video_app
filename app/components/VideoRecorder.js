@@ -9,6 +9,7 @@ import {
   Image,
   Dimensions,
   Alert,
+  PermissionsAndroid,
 } from 'react-native';
 
 import {RNCamera} from 'react-native-camera';
@@ -46,16 +47,49 @@ class VideoRecorder extends Component {
     this.setFlashMode = this.setFlashMode.bind(this);
   }
 
-  add_video_uri = (uri, type, fileName) => {
+  checkPermission_and_add_video_uri = (uri, type, fileName, method) => {
+    PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+    ).then(response => {
+      if (response) {
+        this.add_video_uri(uri, type, fileName, method);
+      } else {
+        PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        ).then(response => {
+          console.warn(response, 'granted');
+          if (response === PermissionsAndroid.RESULTS.GRANTED) {
+            this.add_video_uri(uri, type, fileName, method);
+          } else {
+            Alert.alert(
+              'Need Local Storage Permission. Please allow it from settings.',
+              '',
+              [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    this.props.navigation.navigate('BottomNavigation');
+                  },
+                },
+              ],
+              {cancelable: false},
+            );
+          }
+        });
+      }
+    });
+  };
+  add_video_uri = (uri, type, fileName, method) => {
     let thumbnail_path;
-    RNGRP.getRealPathFromURI(uri).then(filePath => {
+    RNGRP.getRealPathFromURI(uri).then(filePath =>
       RNThumbnail.get(filePath).then(result => {
         thumbnail_path = result.path;
         const id = uuid.v4();
         const video_info = {
           id: id,
-          path: filePath,
           uri: uri,
+          method: method,
+          filePath: filePath,
           type: type ? type : 'video/mp4',
           fileName: fileName ? fileName : `${id}.mp4`,
           thumbnail_path: thumbnail_path,
@@ -63,8 +97,8 @@ class VideoRecorder extends Component {
         };
         const video_list = [video_info, ...this.state.video_list];
         this.props.setVideoList(video_list);
-      });
-    });
+      }),
+    );
   };
   start_timer = () => {
     this.setState({duration: 0});
@@ -110,9 +144,6 @@ class VideoRecorder extends Component {
   // }
   takeVideo = async () => {
     if (this.camera) {
-      // this.camera.getSupportedRatiosAsync().then(response => {
-      //   console.warn(response);
-      // });
       try {
         this.setState({recording: true});
         const options = {
@@ -124,8 +155,12 @@ class VideoRecorder extends Component {
         const promise = this.camera.recordAsync(options);
         if (promise) {
           const data = await promise;
-          console.log(data.uri);
-          this.add_video_uri(data.uri);
+          this.checkPermission_and_add_video_uri(
+            data.uri,
+            null,
+            null,
+            'captured',
+          );
         }
       } catch (error) {
         console.log(error);

@@ -85,6 +85,9 @@ target 'KeyPoints' do
 
   pod 'RCTYouTube', :path => '../node_modules/react-native-youtube'
 
+
+  pod 'RNThumbnail', :path => '../node_modules/react-native-thumbnail'
+
   target 'KeyPointsTests' do
     inherit! :complete
     # Pods for testing

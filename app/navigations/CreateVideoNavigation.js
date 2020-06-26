@@ -11,7 +11,7 @@ import VideoEditor from '../components/VideoEditor';
 const CreateVideoStack = createStackNavigator();
 class CreateVideoNavigation extends Component {
   componentWillUnmount() {
-    this.props.clearVideoList();
+    this.props.clearVideoList(this.props.video_list);
   }
 
   componentDidMount() {

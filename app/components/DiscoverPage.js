@@ -7,6 +7,7 @@ import debounce from 'lodash.debounce';
 import UserAvatarList from './UserAvatarList';
 // import ChannelAvatarList from './ChannelAvatarList';
 import TopicAvatarList from './TopicAvatarList';
+import VideoAvatarList from './VideoAvatarList';
 
 // create a component
 class DiscoverPage extends Component {
@@ -51,9 +52,9 @@ class DiscoverPage extends Component {
           searchText={this.state.debounce_search}
           onClick={this.onClickUser}
         />
-        <TopicAvatarList
-          label={'Trending Topics'}
-          qcat={'trending'}
+        <VideoAvatarList
+          label={'Trending Videos'}
+          qcat={'discover'}
           searchText={this.state.debounce_search}
           qid={1}
           onClick={this.onClickTopic}
@@ -67,6 +68,7 @@ class DiscoverPage extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'white',
   },
   avtar_image: {
     height: 70,

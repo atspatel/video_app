@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Image,
   RefreshControl,
+  ScrollView,
 } from 'react-native';
 import {RecyclerListView, DataProvider, LayoutProvider} from 'recyclerlistview';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -129,8 +130,10 @@ class VideoThumbnailFeed extends Component {
   state = {
     qcat: null,
     qid: null,
-    data_list: null,
+    data_list: [],
+    next_p: 1,
     refreshing: false,
+    isProcessing: false,
   };
 
   deletePost = video_info => {
@@ -144,29 +147,43 @@ class VideoThumbnailFeed extends Component {
     });
   };
 
-  get_video_data() {
-    this.setState({refreshing: true});
-    get_video_data(this.state.qcat, this.state.qid).then(response => {
-      this.setState({refreshing: false});
-      if (response.status) {
-        this.setState({data_list: response.data});
-      }
-    });
-  }
+  getVideoData = async () => {
+    if (!this.state.isProcessing && this.state.next_p !== null) {
+      this.setState({isProcessing: true});
+      await get_video_data(
+        this.state.qcat,
+        this.state.qid,
+        this.state.next_p,
+      ).then(response => {
+        this.setState({isProcessing: false});
+        if (response.status) {
+          const {data, next_p} = response;
+          this.setState({
+            data_list: [...this.state.data_list, ...data],
+            next_p: next_p,
+          });
+        }
+      });
+      return true;
+    }
+    return false;
+  };
 
   onRefresh = () => {
     this._refRecyclerListView
       ? this._refRecyclerListView.scrollToIndex(0)
       : null;
-    this.setState({data_list: [], p: 1}, () => {
-      this.get_video_data();
+    this.setState({data_list: [], next_p: 1, refreshing: true}, () => {
+      this.getVideoData().then(() => {
+        this.setState({refreshing: false});
+      });
     });
   };
   componentDidUpdate() {
     const {qcat, qid} = this.props;
     if ((qcat && this.state.qcat != qcat) || (qid && this.state.qid != qid)) {
       this.setState({qcat: qcat, qid: qid}, () => {
-        this.get_video_data();
+        this.getVideoData();
       });
     }
   }
@@ -219,8 +236,8 @@ class VideoThumbnailFeed extends Component {
     const {onScroll, show_delete} = this.props;
     let {data_list} = this.state;
     // data_list = data_list ? data_list : [];
-    return data_list ? (
-      data_list.length > 0 ? (
+    if (data_list.length > 0) {
+      return (
         <View style={styles.container}>
           <RecyclerListView
             style={{marginTop: 10}}
@@ -231,6 +248,8 @@ class VideoThumbnailFeed extends Component {
             }
             onScroll={onScroll ? onScroll : null}
             scrollThrottle={16}
+            onEndReached={this.getVideoData}
+            onEndReachedThreshold={5 * HEIGHT}
             scrollViewProps={{
               refreshControl: (
                 <RefreshControl
@@ -241,8 +260,20 @@ class VideoThumbnailFeed extends Component {
             }}
           />
         </View>
-      ) : null
-    ) : null;
+      );
+    } else {
+      return (
+        <ScrollView
+          style={{flex: 1}}
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              onRefresh={this.onRefresh}
+            />
+          }
+        />
+      );
+    }
   }
 }
 

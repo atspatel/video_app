@@ -3,12 +3,13 @@ import axios from 'axios';
 
 const host = myConfig.host;
 
-export async function get_video_data(qcat, qid) {
+export async function get_video_data(qcat, qid, next_p) {
   var output = null;
-  let api_url = `${host}/keypoints/video_feed/`;
-  if (qcat && qid) {
-    api_url = `${api_url}?qcat=${qcat}&qid=${qid}`;
+  let api_url = `${host}/keypoints/video_feed/?p=${next_p}`;
+  if (qcat != undefined && qid != undefined) {
+    api_url = `${api_url}&qcat=${qcat}&qid=${qid}`;
   }
+
   await axios
     .get(api_url, {
       headers: {'Content-type': 'application/json'},

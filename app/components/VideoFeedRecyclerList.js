@@ -59,9 +59,11 @@ class VideoFeedRecyclerList extends Component {
       progress: 0,
       focused: true,
       volume: 0,
+
       feed_data: [],
-      p: 1,
-      user_data: [],
+      next_p: 1,
+      isProcessing: false,
+      refreshing: false,
 
       width: winWidth,
       height: winHeight,
@@ -73,9 +75,6 @@ class VideoFeedRecyclerList extends Component {
       r1.likes !== r2.likes ||
       r1.id != r2.id ||
       r1.paused != r2.paused
-      //   ||
-      //   this.state.user_data[r1.user.id].follow_status !=
-      //     this.state.user_data[r2.user.id].follow_status
     );
   });
 
@@ -125,7 +124,7 @@ class VideoFeedRecyclerList extends Component {
     this.setIndex(next_index);
   };
   goPrev = () => {
-    const {current_index, feed_data} = this.state;
+    const {current_index} = this.state;
     const next_index = Math.max(current_index - 1, 0);
     this.setIndex(next_index);
   };
@@ -178,22 +177,43 @@ class VideoFeedRecyclerList extends Component {
     }
   };
 
-  getVideoData() {
-    get_video_data('category', this.state.category.id).then(response => {
-      if (response.status) {
-        const data = response.data;
-        this.setState({feed_data: data}, () => {
-          this.setIndex(0);
-        });
-      }
-    });
-  }
+  getVideoData = async isRefresh => {
+    if (!this.state.isProcessing && this.state.next_p !== null) {
+      this.setState({isProcessing: true});
+      await get_video_data(
+        'category',
+        this.state.category.id,
+        this.state.next_p,
+      ).then(response => {
+        this.setState({isProcessing: false, refreshing: false});
+        if (response.status) {
+          const {data, next_p} = response;
+          const feed_data = isRefresh
+            ? data
+            : [...this.state.feed_data, ...data];
+          this.setState(
+            {
+              feed_data: feed_data,
+              next_p: next_p,
+            },
+            () => {
+              this.setIndex(0);
+            },
+          );
+        }
+      });
+      return true;
+    }
+    return false;
+  };
   onRefresh = () => {
     this._refRecyclerListView
       ? this._refRecyclerListView.scrollToIndex(0)
       : null;
-    this.setState({feed_data: [], p: 1}, () => {
-      this.getVideoData();
+    this.setState({next_p: 1, isProcessing: false, refreshing: true}, () => {
+      this.getVideoData(true).then(() => {
+        this.setState({refreshing: false});
+      });
     });
   };
 
@@ -202,8 +222,8 @@ class VideoFeedRecyclerList extends Component {
       const {isRefresh} = this.props.route.params
         ? this.props.route.params
         : {isRefresh: false};
-      if (isRefresh) {
-        this.getVideoData();
+      if (isRefresh && this.state.current_index !== 0) {
+        this.onRefresh();
       }
     }
   }
@@ -212,7 +232,7 @@ class VideoFeedRecyclerList extends Component {
     const {category} = this.props;
     if (category && this.state.category != category) {
       this.setState({category: category, current_index: 0}, () => {
-        this.getVideoData();
+        this.onRefresh();
       });
     }
   }
@@ -330,6 +350,8 @@ class VideoFeedRecyclerList extends Component {
               this._renderItem('option', data, index)
             }
             //   scrollThrottle={16}
+            onEndReached={this.getVideoData}
+            onEndReachedThreshold={5 * this.state.height}
             scrollViewProps={{
               scrollEnabled: false,
               refreshControl: (

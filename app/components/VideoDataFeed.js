@@ -13,6 +13,9 @@ import GestureRecognizer from 'react-native-swipe-gestures';
 
 import VideoPlayerComp from './VideoPlayerComp';
 import HashTag from './HashTag';
+import {ShareFAB} from './BottomFAB';
+import {DownloadCircularBar} from './VideoCircularProgressBar';
+
 import {
   get_video_data,
   post_video_like,
@@ -31,18 +34,35 @@ const ViewTypes = {
 const {width: winWidth, height: winHeight} = Dimensions.get('window');
 // create a component
 
+class ShareComp extends Component {
+  render() {
+    const {isSharing, progress, onClickShare} = this.props;
+    return (
+      <View style={{position: 'absolute', bottom: 10, left: 10}}>
+        {isSharing ? (
+          <DownloadCircularBar current={progress} total={1} />
+        ) : (
+          <ShareFAB onPress={onClickShare} />
+        )}
+      </View>
+    );
+  }
+}
+
 class VideoDataFeed extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      current_index: 0,
-      //   focused: true,
       feed_data: [],
-      user_data: [],
+      current_index: 0,
 
+      current_post: null,
       width: winWidth,
       height: winHeight,
+
+      isSharing: false,
+      progress: 0,
     };
   }
   dataProvider = new DataProvider((r1, r2) => {
@@ -51,9 +71,6 @@ class VideoDataFeed extends Component {
       r1.likes !== r2.likes ||
       r1.id != r2.id ||
       r1.paused != r2.paused
-      //   ||
-      //   this.state.user_data[r1.user.id].follow_status !=
-      //     this.state.user_data[r2.user.id].follow_status
     );
   });
 
@@ -77,6 +94,7 @@ class VideoDataFeed extends Component {
   setIndex = next_index => {
     const feed_data = this.state.feed_data.map((item, index) => {
       if (index === next_index) {
+        this.setState({current_post: item});
         return Object.assign({}, item, {paused: false});
       } else {
         return Object.assign({}, item, {paused: true});
@@ -110,6 +128,25 @@ class VideoDataFeed extends Component {
   onClickUser = user_info => {
     RootNavigationRef.navigate('CreatorProfile', {user: user_info.id});
   };
+  updateProgess = progress => {
+    this.setState({progress: progress});
+  };
+  onShared = action => {
+    this.setState({isSharing: false});
+  };
+  onClickShare = () => {
+    const {current_post} = this.state;
+    if (current_post) {
+      this.setState({isSharing: true});
+      download_and_share_video(
+        current_post.share_url,
+        current_post.title,
+        current_post.external_urls,
+        this.updateProgess,
+        this.onShared,
+      );
+    }
+  };
 
   onClickLike = (id, action) => {
     post_video_like(id, action).then(response => {
@@ -133,35 +170,13 @@ class VideoDataFeed extends Component {
     });
   };
 
-  onClickShare = video_info => {
-    download_and_share_video(video_info.share_url, null);
-  };
+  // onClickShare = video_info => {
+  //   download_and_share_video(video_info.share_url, null);
+  // };
 
   onClickFollow(action, creator_info) {
     post_follow('creator', action, creator_info.id);
   }
-
-  //   getVideoData() {
-  //     get_video_data('category', this.state.category.id).then(response => {
-  //       if (response.status) {
-  //         const data = response.data;
-  //         this.setState({feed_data: data}, () => {
-  //           this.setIndex(0);
-  //         });
-  //       }
-  //     });
-  //   }
-
-  //   componentWillReceiveProps(prevProps) {
-  //     if (this.state.focused) {
-  //       const {isRefresh} = this.props.route.params
-  //         ? this.props.route.params
-  //         : {isRefresh: false};
-  //       if (isRefresh) {
-  //         this.getVideoData();
-  //       }
-  //     }
-  //   }
 
   componentDidUpdate() {}
 
@@ -234,24 +249,19 @@ class VideoDataFeed extends Component {
                 name={'thumb-up'}
                 size={item.liked ? 30 : 25}
                 color={item.liked ? 'lightblue' : 'black'}
-                style={{marginHorizontal: 10}}
+                style={{marginHorizontal: 70}}
               />
               <Text style={{textAlign: 'center', color: 'black'}}>
                 {item.likes}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity>
-              <MaterialCommunityIcons
-                onPress={() => this.onClickShare(item)}
-                name={'share-variant'}
-                size={30}
-                color={'black'}
-                style={{marginHorizontal: 10}}
-              />
-              {/* <Text style={{textAlign: 'center', color: 'black'}}>100</Text> */}
-            </TouchableOpacity>
           </View>
         </View>
+        <ShareComp
+          isSharing={this.state.isSharing}
+          progress={this.state.progress}
+          onClickShare={this.onClickShare}
+        />
       </View>
     );
   }
@@ -285,12 +295,6 @@ class VideoDataFeed extends Component {
             }
             scrollViewProps={{
               scrollEnabled: false,
-              //   refreshControl: (
-              //     <RefreshControl
-              //       refreshing={this.state.refreshing}
-              //       onRefresh={this.onRefresh}
-              //     />
-              //   ),
             }}
           />
         </GestureRecognizer>

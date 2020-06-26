@@ -41,7 +41,6 @@ export async function download_and_share_video(
 export async function share_post(filepath, title, ext_url, onShared) {
   // var message = 'Shared Via: KeyPoints http://bit.ly/CratConn';
   let message = title ? title : '';
-  console.warn(ext_url);
   if (ext_url && ext_url.length > 0) {
     message = `${message}..  To Know More: ${ext_url}`;
   }

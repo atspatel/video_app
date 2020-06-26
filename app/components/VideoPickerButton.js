@@ -29,6 +29,7 @@ class VideoPickerButton extends Component {
               response.uri,
               response.type,
               response.fileName,
+              'uploaded',
             );
           } else {
             const video_info = {

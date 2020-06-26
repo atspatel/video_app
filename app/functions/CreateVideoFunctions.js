@@ -8,7 +8,7 @@ export const setVideoList = video_list => dispatch => {
   });
 };
 
-export const clearVideoList = () => dispatch => {
+export const clearVideoList = video_list => dispatch => {
   dispatch({
     type: Actions.CLEAR_VIDEO_LIST,
   });

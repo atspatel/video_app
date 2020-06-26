@@ -1,6 +1,6 @@
 //import liraries
 import React, {Component} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, Alert} from 'react-native';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -52,7 +52,22 @@ export class DownloadIcon extends Component {
 export class DeleteIcon extends Component {
   onPress = () => {
     if (this.props.onPress) {
-      this.props.onPress();
+      Alert.alert(
+        'Do you want to delete this post?',
+        '',
+        [
+          {
+            text: 'Cancel',
+            onPress: () => null,
+            style: 'cancel',
+          },
+          {
+            text: 'Delete',
+            onPress: () => this.props.onPress(),
+          },
+        ],
+        {cancelable: false},
+      );
     }
   };
   render() {

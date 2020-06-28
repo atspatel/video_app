@@ -49,21 +49,29 @@ export class DownloadCircularBar extends Component {
         size={a_size}
         width={3}
         fill={current ? (1 - current / total) * 100 : 100}
-        tintColor="black"
-        backgroundColor="#DDD">
+        tintColor="white"
+        backgroundColor="#999">
         {fill => (
-          <DownloadIcon
-            size={a_size - 10}
-            color="black"
+          <View
             style={{
-              backgroundColor: 'white',
-              padding: -10,
-              margin: -10,
+              height: a_size,
+              width: a_size,
+              backgroundColor: '#DDD',
               justifyContent: 'center',
               alignItems: 'center',
-            }}
-          />
-          // </View>
+            }}>
+            <DownloadIcon
+              size={a_size - 10}
+              color="black"
+              style={{
+                backgroundColor: '#DDD',
+                padding: -10,
+                margin: -10,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            />
+          </View>
         )}
       </AnimatedCircularProgress>
     );

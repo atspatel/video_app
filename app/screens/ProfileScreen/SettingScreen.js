@@ -290,16 +290,14 @@ class SettingScreen extends Component {
             }}>
             <FontAwesome name={'at'} size={20} />
             <TextInput
-              editable={false}
+              // editable={false}
               placeholder={'username'}
-              placeholderTextColor={'#DDD'}
-              value={
-                this.state.username.text
-                  ? this.state.username.text.toLowerCase()
-                  : null
-              }
+              placeholderTextColor={this.state.username.error ? 'red' : '#DDD'}
+              value={this.state.username.text}
               onChangeText={text =>
-                this.setState({username: text, error: null})
+                this.setState({
+                  username: {text: text, error: null},
+                })
               }
               style={{
                 fontSize: 18,

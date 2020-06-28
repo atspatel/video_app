@@ -14,11 +14,7 @@ import GestureRecognizer from 'react-native-swipe-gestures';
 
 import VideoPlayerComp from './VideoPlayerComp';
 import HashTag from './HashTag';
-import {
-  get_video_data,
-  post_video_like,
-  // post_video_reshare,
-} from '../functions/VideoFeedApi';
+import {get_video_data, post_video_like} from '../functions/VideoFeedApi';
 import {download_and_share_video} from '../functions/ShareAppActions';
 import {showLogInAlert} from '../functions/AuthFunctions';
 
@@ -37,7 +33,7 @@ class ShareComp extends Component {
   render() {
     const {isSharing, progress, onClickShare} = this.props;
     return (
-      <View style={{position: 'absolute', bottom: 10, left: 10}}>
+      <View style={{position: 'absolute', bottom: 0, left: 10}}>
         {isSharing ? (
           <DownloadCircularBar current={progress} total={1} />
         ) : (
@@ -65,8 +61,8 @@ class VideoFeedRecyclerList extends Component {
       isProcessing: false,
       refreshing: false,
 
-      width: winWidth,
-      height: winHeight,
+      width: null,
+      height: null,
     };
   }
   dataProvider = new DataProvider((r1, r2) => {
@@ -271,7 +267,7 @@ class VideoFeedRecyclerList extends Component {
           video_info={item}
           paused={item.paused}
           onEnd={this.goNext}
-          height={0.7 * winHeight}
+          height={0.75 * winHeight}
           onClickUser={this.onClickUser}
         />
         <View style={styles.video_title}>
@@ -303,17 +299,18 @@ class VideoFeedRecyclerList extends Component {
               marginBottom: 0,
               flexDirection: 'row',
             }}>
-            <TouchableOpacity>
+            <TouchableOpacity
+              style={{flexDirection: 'row', alignItems: 'center'}}>
               <MaterialCommunityIcons
                 onPress={() =>
                   this.onClickLike(item.id, item.liked ? 'unlike' : 'like')
                 }
                 name={'thumb-up'}
                 size={item.liked ? 30 : 25}
-                color={item.liked ? 'lightblue' : 'black'}
-                style={{marginHorizontal: 70}}
+                color={item.liked ? 'lightblue' : 'white'}
+                style={{marginLeft: 70}}
               />
-              <Text style={{textAlign: 'center', color: 'black'}}>
+              <Text style={{textAlign: 'center', color: 'white'}}>
                 {item.likes}
               </Text>
             </TouchableOpacity>
@@ -328,7 +325,7 @@ class VideoFeedRecyclerList extends Component {
       directionalOffsetThreshold: 80,
     };
     const {feed_data} = this.state;
-    return feed_data.length > 0 ? (
+    return feed_data.length > 0 && this.state.height ? (
       <View
         style={{
           height: this.state.height,
@@ -388,19 +385,20 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
   },
   video_title: {
-    backgroundColor: 'white',
+    backgroundColor: 'black',
     flex: 1,
-    marginHorizontal: 10,
+    paddingHorizontal: 10,
     // marginBottom: 10,
   },
   title_text: {
+    marginTop: 5,
     fontFamily: 'serif',
-    fontSize: 20,
-    lineHeight: 25,
-    maxHeight: 110,
+    fontSize: 18,
+    lineHeight: 20,
+    maxHeight: 65,
     // textAlign: 'justify',
     overflow: 'hidden',
-    color: 'black',
+    color: 'white',
   },
   source_text: {
     fontSize: 15,

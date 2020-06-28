@@ -60,3 +60,6 @@ buck-out/
 
 .vscode/
 app/src/*
+
+#configfile
+config.js

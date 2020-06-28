@@ -150,7 +150,7 @@ export const PostCreatorBio = form_state => dispatch => {
       name: form_state.avatar.image_uri.fileName,
     });
   }
-  const api_url = `${host}/keypoints/creators/`;
+  const api_url = `${host}/keypoints_account/creators/`;
   return axios
     .post(api_url, formData, {})
     .then(response => {

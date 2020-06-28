@@ -242,12 +242,12 @@ class VideoPlayerComp extends Component {
                     ? (1 - this.state.current / this.state.duration) * 100
                     : 100
                 }
-                tintColor="black"
-                backgroundColor="#FFFFFF">
+                tintColor="white"
+                backgroundColor="#999">
                 {fill => (
                   <View
                     style={{
-                      backgroundColor: 'white',
+                      backgroundColor: '#999',
                       height: 50,
                       width: 50,
                       alignItems: 'center',
@@ -337,6 +337,7 @@ class VideoPlayerComp extends Component {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
+    backgroundColor: 'black',
   },
   overlay_play: {
     position: 'absolute',
@@ -371,7 +372,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 0,
     opacity: 1.0,
-    backgroundColor: 'rgba(255, 255,  255, 0.3)',
+    backgroundColor: 'rgba(0, 0,  0, 0.3)',
   },
 });
 

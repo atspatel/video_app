@@ -60,7 +60,7 @@ export class ShareFAB extends Component {
             height: 50,
             borderRadius: 30,
             borderWidth: 1,
-            backgroundColor: 'black',
+            backgroundColor: 'white',
             borderColor: 'black',
           },
         ]}
@@ -69,7 +69,7 @@ export class ShareFAB extends Component {
           return (
             <ShareIcon
               size={30}
-              color="white"
+              color="black"
               style={{
                 margin: -10,
                 alignSelf: 'center',

@@ -74,8 +74,10 @@ export class MyTabBar extends Component {
         style={{
           flexDirection: 'row',
           alignItems: 'flex-end',
-          height: 50,
+          height: 40,
           backgroundColor: 'black',
+          borderTopColor: 'white',
+          borderTopWidth: 1,
         }}>
         {navState.routes.map((route, index) => {
           const {options} = descriptors[route.key];
@@ -115,7 +117,7 @@ export class MyTabBar extends Component {
             return (
               <View
                 key={index}
-                style={{alignItems: 'center', marginBottom: 10, flex: 1}}>
+                style={{alignItems: 'center', marginBottom: 0, flex: 1}}>
                 <CreateFAB />
               </View>
             );

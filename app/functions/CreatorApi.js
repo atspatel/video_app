@@ -6,7 +6,7 @@ const host = myConfig.host;
 
 export async function post_follow(category, action, qid) {
   var output = null;
-  let api_url = `${host}/keypoints/follow/`;
+  let api_url = `${host}/keypoints_account/follow/`;
   const data = {category: category, action: action, qid: qid};
   await axios
     .post(api_url, data)
@@ -19,7 +19,7 @@ export async function post_follow(category, action, qid) {
 
 export async function get_follow(category, id) {
   var output = null;
-  let api_url = `${host}/keypoints/follow/?category=${category}&qid=${id}`;
+  let api_url = `${host}/keypoints_account/follow/?category=${category}&qid=${id}`;
   await axios
     .get(api_url)
     .then(response => {
@@ -31,7 +31,7 @@ export async function get_follow(category, id) {
 
 export async function get_creator_data(seacrhText, short) {
   var output = null;
-  let api_url = `${host}/keypoints/creators/`;
+  let api_url = `${host}/keypoints_account/creators/`;
   if (seacrhText) {
     api_url = `${api_url}${seacrhText}/`;
   }
@@ -49,7 +49,7 @@ export async function get_creator_data(seacrhText, short) {
 
 export async function getUserData(user_id) {
   var output = null;
-  let api_url = `${host}/keypoints/creators/?user_id=${user_id}`;
+  let api_url = `${host}/keypoints_account/creators/?user_id=${user_id}`;
   await axios
     .get(api_url)
     .then(response => {

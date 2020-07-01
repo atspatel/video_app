@@ -3,6 +3,18 @@ import axios from 'axios';
 
 const host = myConfig.host;
 
+export async function get_single_video_data(video_id) {
+  var output = null;
+  let api_url = `${host}/keypoints/video_feed/${video_id}/`;
+  await axios
+    .get(api_url)
+    .then(response => {
+      output = response.data;
+    })
+    .catch(error => console.error(error));
+  return output;
+}
+
 export async function get_video_data(qcat, qid, next_p) {
   var output = null;
   let api_url = `${host}/keypoints/video_feed/?p=${next_p}`;

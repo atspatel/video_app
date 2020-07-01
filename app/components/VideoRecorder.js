@@ -79,7 +79,7 @@ class VideoRecorder extends Component {
       }
     });
   };
-  add_video_uri = (uri, type, fileName, method) => {
+  add_video_uri = (uri, type, fileName, method, path) => {
     let thumbnail_path;
     RNGRP.getRealPathFromURI(uri).then(filePath =>
       RNThumbnail.get(filePath).then(result => {
@@ -184,7 +184,14 @@ class VideoRecorder extends Component {
   };
 
   onClickEditDraft = () => {
-    this.props.navigation.navigate('VideoDraft');
+    console.warn(this.props.video_list.length, '----');
+    if (this.props.video_list.length === 1) {
+      this.props.navigation.navigate('VideoEditor', {
+        video_info: this.props.video_list[0],
+      });
+    } else {
+      this.props.navigation.navigate('VideoDraft');
+    }
   };
   handleBackButtonClick = () => {
     if (this.state.recording) {

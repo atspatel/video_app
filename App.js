@@ -8,6 +8,7 @@ import MainAppNavigation from './app/navigations';
 
 import {NavigationContainer} from '@react-navigation/native';
 import {navigationRef} from './RootNavigationRef';
+import PushController from './app/components/PushController';
 
 class App extends Component {
   render() {
@@ -16,6 +17,7 @@ class App extends Component {
         <PersistGate loading={null} persistor={persistor}>
           <NavigationContainer ref={navigationRef}>
             <MainAppNavigation />
+            <PushController />
           </NavigationContainer>
         </PersistGate>
       </Provider>

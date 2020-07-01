@@ -366,7 +366,6 @@ class ProfilePage extends Component {
     this.props.navigation.navigate('ProfileNavigation');
   };
   onUpdateInfo = () => {
-    console.warn('here.......');
     this.get_user_data();
   };
 

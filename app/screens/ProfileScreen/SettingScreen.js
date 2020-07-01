@@ -8,14 +8,17 @@ import {
   Alert,
   Dimensions,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import ProfilePicUpload from '../../components/ProfilePicUpload';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import debounce from 'lodash.debounce';
 
 import SelectLangCat from '../../components/SelectLangCat';
 import {Text} from '../../components';
 import {LogOutfunc, PostCreatorBio} from '../../functions/AuthFunctions';
 import {get_options} from '../../functions/CategoryFunctions';
+import {check_username} from '../../functions/CreatorApi';
 // create a component
 class NameInput extends Component {
   render() {
@@ -54,38 +57,44 @@ class NameInput extends Component {
 const dummy_url =
   'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSDgTNKTeE985pM29w_MVlLv6Q6zXuK8qHKq4O0pcB_aWH4JbQV';
 class SettingScreen extends Component {
-  state = {
-    avatar: {
-      type: 'image',
-      label: '',
-      image_uri: {
-        uri: dummy_url,
-        type: 'image/jpg',
-        fileName: 'temp_image.jpg',
+  constructor(props) {
+    super(props);
+    this.state = {
+      avatar: {
+        type: 'image',
+        label: '',
+        image_uri: {
+          uri: dummy_url,
+          type: 'image/jpg',
+          fileName: 'temp_image.jpg',
+        },
       },
-    },
-    username: {text: null, error: null},
-    about: null,
-    FirstName: {
-      text: null,
-      error: null,
-    },
-    LastName: {
-      text: null,
-      error: null,
-    },
+      username: {text: null, error: null},
+      isChecking: false,
+      about: null,
+      FirstName: {
+        text: null,
+        error: null,
+      },
+      LastName: {
+        text: null,
+        error: null,
+      },
 
-    languages: {
-      options_list: [],
-      selected_list: [],
-      error: false,
-    },
-    categories: {
-      options_list: [],
-      selected_list: [],
-      error: false,
-    },
-  };
+      languages: {
+        options_list: [],
+        selected_list: [],
+        error: false,
+      },
+      categories: {
+        options_list: [],
+        selected_list: [],
+        error: false,
+      },
+    };
+    this.onChangeTextDelayed = debounce(this.checkUsername, 500);
+  }
+
   onChangeProfilePic = response => {
     this.setState({
       avatar: {
@@ -120,10 +129,38 @@ class SettingScreen extends Component {
     });
   };
 
+  onChangeUserName = text => {
+    this.setState({
+      username: {text: text, error: null, isValid: null},
+    });
+    this.onChangeTextDelayed();
+  };
+
+  checkUsername = () => {
+    const {username} = this.state;
+    if (username.text && username.text.length > 3) {
+      this.setState({isChecking: true});
+      check_username(this.state.username.text).then(response => {
+        this.setState({
+          username: {...this.state.username, isValid: response.status},
+          isChecking: false,
+        });
+      });
+    } else {
+      this.setState({
+        username: {...this.state.username, isValid: false},
+      });
+    }
+  };
+
   validate_form = () => {
     let isValid = true;
     const {username, FirstName, categories, languages} = this.state;
-    if (username.text === null || username.text.length === 0) {
+    if (
+      username.text === null ||
+      username.text.length === 0 ||
+      username.isValid === false
+    ) {
       this.setState({username: {...username, error: true}});
       isValid = false;
     }
@@ -258,6 +295,7 @@ class SettingScreen extends Component {
           user_data.languages_data,
           user_data.categories_data,
         );
+        this.checkUsername();
       },
     );
   }
@@ -294,11 +332,7 @@ class SettingScreen extends Component {
               placeholder={'username'}
               placeholderTextColor={this.state.username.error ? 'red' : '#DDD'}
               value={this.state.username.text}
-              onChangeText={text =>
-                this.setState({
-                  username: {text: text, error: null},
-                })
-              }
+              onChangeText={this.onChangeUserName}
               style={{
                 fontSize: 18,
                 flex: 1,
@@ -306,6 +340,15 @@ class SettingScreen extends Component {
                 alignSelf: 'stretch',
               }}
             />
+            {this.state.isChecking ? (
+              <ActivityIndicator size="small" color="#000000" />
+            ) : this.state.username.isValid !== null ? (
+              this.state.username.isValid ? (
+                <FontAwesome name={'check-circle'} size={30} color={'green'} />
+              ) : (
+                <FontAwesome name={'times-circle'} size={30} color={'red'} />
+              )
+            ) : null}
           </View>
           <NameInput
             FirstName={FirstName}

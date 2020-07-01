@@ -6,22 +6,50 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import VideoThumbnailFeed from '../../components/VideoThumbnailFeed';
 import FollowButton from '../../components/FollowButton';
 
+import {get_follow, post_follow} from '../../functions/CreatorApi';
+
 // create a component
 class HashtagScreen extends Component {
   state = {
     hashtag: null,
+    isFollowed: null,
   };
 
-  componentDidMount() {
+  onFollow = action => {
+    if (this.state.hashtag) {
+      post_follow('hashtag', action, this.state.hashtag.id).then(response => {
+        console.warn(response, 'post');
+        if (response.status) {
+          this.setState({isFollowed: response.is_followed});
+        }
+      });
+    }
+  };
+
+  getFollow = () => {
+    if (this.state.hashtag) {
+      get_follow('hashtag', this.state.hashtag.id).then(response => {
+        console.warn(response, 'get');
+        if (response.status) {
+          this.setState({isFollowed: response.is_followed});
+        }
+      });
+    }
+  };
+
+  componentDidUpdate() {
     const {hashtag} = this.props.route
       ? this.props.route.params
       : {hashtag: null};
     if (this.state.hashtag != hashtag) {
-      this.setState({hashtag: hashtag});
+      this.setState({hashtag: hashtag}, () => this.getFollow());
     }
   }
+  componentDidMount() {
+    this.componentDidUpdate();
+  }
   render() {
-    const {hashtag} = this.state;
+    const {hashtag, isFollowed} = this.state;
     return hashtag ? (
       <View style={styles.container}>
         <View
@@ -49,7 +77,10 @@ class HashtagScreen extends Component {
                 flexDirection: 'row',
               }}>
               <View style={{flex: 1}}>
-                <FollowButton />
+                <FollowButton
+                  isFollowed={isFollowed}
+                  onFollow={this.onFollow}
+                />
               </View>
               {hashtag.views ? (
                 <Text style={{flex: 1}}>{hashtag.views} Views</Text>

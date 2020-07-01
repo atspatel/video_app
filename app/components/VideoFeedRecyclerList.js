@@ -300,7 +300,15 @@ class VideoFeedRecyclerList extends Component {
               flexDirection: 'row',
             }}>
             <TouchableOpacity
-              style={{flexDirection: 'row', alignItems: 'center'}}>
+              style={{
+                flexDirection: 'row',
+                alignItems: 'flex-end',
+                marginLeft: 70,
+                marginBottom: 10,
+              }}>
+              <Text style={{textAlign: 'center', color: 'white'}}>
+                {item.likes}
+              </Text>
               <MaterialCommunityIcons
                 onPress={() =>
                   this.onClickLike(item.id, item.liked ? 'unlike' : 'like')
@@ -308,11 +316,7 @@ class VideoFeedRecyclerList extends Component {
                 name={'thumb-up'}
                 size={item.liked ? 30 : 25}
                 color={item.liked ? 'lightblue' : 'white'}
-                style={{marginLeft: 70}}
               />
-              <Text style={{textAlign: 'center', color: 'white'}}>
-                {item.likes}
-              </Text>
             </TouchableOpacity>
           </View>
         </View>

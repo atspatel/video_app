@@ -62,7 +62,7 @@ export const upload_video_data = (
           url: url_info ? url_info : '',
           session: session_id,
         },
-        maxRetries: 2,
+        maxRetries: 0,
         headers: {
           'content-type': 'application/octet-stream', // Customize content-type
           Authorization: `token ${user_token}`,
@@ -87,53 +87,26 @@ export const upload_video_data = (
             console.log(`Cancelled!`);
           });
           Upload.addListener('completed', uploadId, data => {
-            // data includes responseCode: number and responseBody: Object
-            console.log(`uploaded!`, data);
             const response = JSON.parse(data.responseBody);
-            if (response.status) {
-              Alert.alert(
-                'Post created successfully.',
-                '',
-                [
-                  {
-                    text: 'Cancel',
-                    onPress: () => (cancel_fun ? cancel_fun() : null),
-                    style: 'cancel',
-                  },
-                  {
-                    text: 'Ok',
-                    onPress: () => null,
-                  },
-                ],
-                {cancelable: false},
-              );
-              if (video_info.method === 'captured') {
-                RNFetchBlob.fs.unlink(video_info.filePath);
-                RNFetchBlob.fs.unlink(video_info.uri.replace('file://', ''));
-                RNFetchBlob.fs.unlink(video_info.thumbnail_path);
-              }
-            } else {
-              Alert.alert(
-                response.message,
-                '',
-                [
-                  {
-                    text: 'Cancel',
-                    onPress: () => (cancel_fun ? cancel_fun() : null),
-                    style: 'cancel',
-                  },
-                  {
-                    text: 'Ok',
-                    onPress: () => null,
-                  },
-                ],
-                {cancelable: false},
-              );
-              dispatch({
-                type: Actions.ADD_VIDEO_DATA,
-                video_data: video_info,
-              });
-            }
+            Alert.alert(
+              response.message,
+              '',
+              [
+                {
+                  text: 'Cancel',
+                  onPress: () => (cancel_fun ? cancel_fun() : null),
+                  style: 'cancel',
+                },
+                {
+                  text: 'Ok',
+                  onPress: () => null,
+                },
+              ],
+              {cancelable: false},
+            );
+            RNFetchBlob.fs.unlink(video_info.filePath);
+            RNFetchBlob.fs.unlink(video_info.uri.replace('file://', ''));
+            RNFetchBlob.fs.unlink(video_info.thumbnail_path);
           });
         })
         .catch(err => {

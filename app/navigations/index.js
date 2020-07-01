@@ -8,7 +8,7 @@ import ProfilePage from '../screens/ProfileScreen/ProfilePage';
 import VideoFeedScreen from '../screens/VideoFeedScreen/VideoFeedScreen';
 import WebViewer from '../screens/WebViewer';
 import Home from '../components/Home';
-import {HashtagScreen, TopicScreen} from '../screens/FeedScreen';
+import {HashtagScreen, TopicScreen, VideoPage} from '../screens/FeedScreen';
 
 const Stack = createStackNavigator();
 
@@ -50,8 +50,21 @@ class MainAppNavigation extends Component {
           component={TopicScreen}
           initialParams={{}}
         />
-        <Stack.Screen name="CreateScreen" component={CreateVideoNavigation} />
-        <Stack.Screen name="CreatorProfile" component={ProfilePage} />
+        <Stack.Screen
+          name="CreateScreen"
+          component={CreateVideoNavigation}
+          initialParams={{}}
+        />
+        <Stack.Screen
+          name="CreatorProfile"
+          component={ProfilePage}
+          initialParams={{}}
+        />
+        <Stack.Screen
+          name="VideoPage"
+          component={VideoPage}
+          initialParams={{}}
+        />
         <Stack.Screen
           name="VideoFeedScreen"
           component={VideoFeedScreen}

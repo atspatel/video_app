@@ -59,6 +59,18 @@ export async function getUserData(user_id) {
   return output;
 }
 
+export async function check_username(username) {
+  var output = null;
+  let api_url = `${host}/keypoints_account/check_username/${username}/`;
+  await axios
+    .get(api_url)
+    .then(response => {
+      output = response.data;
+    })
+    .catch(error => console.error(error));
+  return output;
+}
+
 export const updateFollowMapping = (qid, is_followed) => dispatch => {
   dispatch({
     type: Actions.UPDATE_FOLLOW_MAPPING,

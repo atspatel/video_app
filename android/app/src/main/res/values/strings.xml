@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">KeyPoints</string>
+    <string name="default_notification_channel_id" translatable="false">keypoints_channel_1</string>
 </resources>

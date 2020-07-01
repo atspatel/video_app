@@ -72,3 +72,12 @@ export async function post_preferences(languages, categories) {
   });
   return output;
 }
+
+export async function get_hashtag_follow(hahstag_id) {
+  let output = null;
+  let api_url = `${host}/keypoints/hashtag_follow/${hahstag_id}/`;
+  await axios.get(api_url).then(response => {
+    output = response.data;
+  });
+  return output;
+}

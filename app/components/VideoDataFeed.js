@@ -207,7 +207,7 @@ class VideoDataFeed extends Component {
           video_info={item}
           paused={item.paused}
           onEnd={this.goNext}
-          height={0.7 * winHeight}
+          height={0.75 * winHeight}
           width={winWidth}
           onClickUser={this.onClickUser}
           onClickFollow={this.onClickFollow}
@@ -318,6 +318,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
   },
   video_title: {
+    alignSelf: 'stretch',
     backgroundColor: 'white',
     flex: 1,
     marginHorizontal: 10,
@@ -328,7 +329,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     lineHeight: 25,
     maxHeight: 105,
-    // textAlign: 'justify',
     overflow: 'hidden',
     color: 'black',
   },

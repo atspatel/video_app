@@ -6,9 +6,14 @@ class FollowButton extends Component {
   state = {
     isFollowed: false,
   };
-  componentDidMount() {
+  componentDidUpdate() {
     const {isFollowed} = this.props;
-    this.setState({isFollowed});
+    if (this.state.isFollowed !== isFollowed) {
+      this.setState({isFollowed});
+    }
+  }
+  componentDidMount() {
+    this.componentDidUpdate();
   }
   onFollow = action => {
     this.setState({isFollowed: action === 'follow' ? true : false});

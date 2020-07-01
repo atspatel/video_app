@@ -10,6 +10,9 @@ import {NavigationContainer} from '@react-navigation/native';
 import {navigationRef} from './RootNavigationRef';
 import PushController from './app/components/PushController';
 
+import fixTextCutOff from './font_fix';
+fixTextCutOff();
+
 class App extends Component {
   render() {
     return (

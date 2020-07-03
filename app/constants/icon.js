@@ -7,6 +7,20 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Entypo from 'react-native-vector-icons/Entypo';
 
+export class LikeIcon extends Component {
+  render() {
+    const {size, color, style} = this.props;
+    return (
+      <MaterialCommunityIcons
+        name={'thumb-up'}
+        size={size ? size : 35}
+        color={color ? color : 'white'}
+        style={[{padding: 5, minWidth: 35}, style]}
+      />
+    );
+  }
+}
+
 export class ShareIcon extends Component {
   render() {
     const {size, color, style} = this.props;

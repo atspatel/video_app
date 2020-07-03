@@ -81,7 +81,7 @@ class VideoThumbnail extends Component {
             activeOpacity={1}
             style={{
               height: 45,
-              //   backgroundColor: '#DDD',xw
+              //   backgroundColor: '#DDD'
               justifyContent: 'space-between',
               flexDirection: 'row',
               alignItems: 'center',

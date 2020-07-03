@@ -19,9 +19,9 @@ let dataProvider = new DataProvider((r1, r2) => {
   return r1.is_followed !== r2.is_followed;
 });
 
-class SourceCard extends Component {
+export class SourceCard extends Component {
   render() {
-    const {source_info, onPressFollow} = this.props;
+    const {source_info, showFollow} = this.props;
     return (
       <View
         style={{
@@ -37,23 +37,19 @@ class SourceCard extends Component {
           user_name={source_info.name}
           size={70}
         />
-        {/* <Image
-          source={{uri: source_info.profile_pic}}
-          style={styles.avtar_image}
-        /> */}
         <Text style={styles.avatar_name} numberOfLines={1}>
           {source_info.name ? source_info.name.substring(0, 12) : null}
         </Text>
         <Text style={styles.follow_count}>
           {source_info.followers} followers
         </Text>
-        <FollowButton
-          qid={source_info.id}
-          qcat={'user'}
-          // isFollowed={source_info.follow_status == 'follow' ? true : false}
-          isSelf={source_info.follow_status == 'self' ? true : false}
-          // onFollow={action => onPressFollow(action, source_info)}
-        />
+        {showFollow ? (
+          <FollowButton
+            qid={source_info.id}
+            qcat={'user'}
+            isSelf={source_info.follow_status == 'self' ? true : false}
+          />
+        ) : null}
       </View>
     );
   }
@@ -86,20 +82,6 @@ class UserAvatarList extends Component {
     },
   );
 
-  onFollow = (action, source_info) => {
-    //TODO:: Call Follow api here
-    post_follow('creator', action, source_info.id).then(response => {
-      if (response.status) {
-        const data_list = this.state.data_list.map(item => {
-          if (item.id === response.id) {
-            return Object.assign({}, item, {is_followed: response.is_followed});
-          }
-          return item;
-        });
-        this.setState({data_list: data_list});
-      }
-    });
-  };
   toggleUserSection = () => {
     this.setState({isExpanded: !this.state.isExpanded});
   };
@@ -140,7 +122,7 @@ class UserAvatarList extends Component {
           onPress={() => {
             return this.props.onClick ? this.props.onClick(data.id) : true;
           }}>
-          <SourceCard source_info={data} onPressFollow={this.onFollow} />
+          <SourceCard source_info={data} showFollow={true} />
         </TouchableOpacity>
       </View>
     );

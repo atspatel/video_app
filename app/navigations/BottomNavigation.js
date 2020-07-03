@@ -103,7 +103,10 @@ export class MyTabBar extends Component {
             if (!isFocused && !event.defaultPrevented) {
               navigation.navigate(route.name, params);
             } else if (route.name === 'HomeTab') {
-              navigation.navigate(route.name, params);
+              navigation.navigate(route.name, {
+                screen: 'Videos',
+                params: {isRefresh: isFocused},
+              });
             }
           };
 

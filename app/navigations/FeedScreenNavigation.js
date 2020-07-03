@@ -15,15 +15,6 @@ class FeedStackNavigator extends Component {
         screenOptions={{
           headerShown: false,
           gestureEnabled: false,
-          // headerTitleAlign: 'center',
-          // headerTitleStyle: {
-          //   fontFamily: 'serif',
-          //   height: 30,
-          //   textAlign: 'center',
-          // },
-          // headerStyle: {
-          //   height: 40,
-          // },
         }}>
         <FeedStack.Screen
           name="HashtagScreen"

@@ -1,66 +1,41 @@
 import React, {Component} from 'react';
-import {createStackNavigator} from '@react-navigation/stack';
+
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+import FeedScreen from '../screens/FeedScreen/FeedScreen';
 
-import TopicFeed from '../components/TopicFeed';
-// import VideoFeed from '../components/VideoFeed';
-import VideoFeedRecyclerList from '../components/VideoFeedRecyclerList';
-import TopicTitle from '../components/HeaderTitle';
+// import {createStackNavigator} from '@react-navigation/stack';
+// import TopicFeed from '../components/TopicFeed';
 
-const TopicStack = createStackNavigator();
-class TopicStackNavigator extends Component {
-  render() {
-    const {setRoute} = this.props.route.params;
-    return (
-      <TopicStack.Navigator
-        initialRouteName="TopicFeed"
-        screenOptions={{
-          headerShown: false,
-          gestureEnabled: false,
-        }}>
-        <TopicStack.Screen
-          name="TopicFeed"
-          component={TopicFeed}
-          initialParams={{
-            setRoute: setRoute,
-          }}
-        />
-        <TopicStack.Screen
-          name="TopicVideoFeed"
-          component={VideoFeedRecyclerList}
-          options={({route}) => ({title: route.params.topic.name})}
-        />
-      </TopicStack.Navigator>
-    );
-  }
-}
+// const TopicStack = createStackNavigator();
+// class TopicStackNavigator extends Component {
+//   render() {
+//     return (
+//       <TopicStack.Navigator
+//         initialRouteName="TopicFeed"
+//         screenOptions={{
+//           headerShown: false,
+//           gestureEnabled: false,
+//         }}>
+//         <TopicStack.Screen
+//           name="TopicFeed"
+//           component={TopicFeed}
+//           initialParams={{
+//             setRoute: setRoute,
+//           }}
+//         />
+//         <TopicStack.Screen
+//           name="TopicVideoFeed"
+//           component={FeedScreen}
+//           options={({route}) => ({title: route.params.topic.name})}
+//         />
+//       </TopicStack.Navigator>
+//     );
+//   }
+// }
 
 const HomeTab = createMaterialTopTabNavigator();
 
 export class HomeNavigation extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      active_route: 'Videos',
-    };
-  }
-
-  componentDidMount() {
-    this._focused = this.props.navigation.addListener('tabPress', payload => {
-      const {isRefresh} = payload ? payload.data : {isRefresh: false};
-      this.props.navigation.navigate(this.state.active_route, {
-        isRefresh: isRefresh,
-      });
-    });
-  }
-
-  set_active_route = route_name => {
-    this.setState({active_route: route_name});
-  };
-  componentWillUnmount() {
-    this._focused();
-  }
   render() {
     return (
       <HomeTab.Navigator
@@ -76,17 +51,13 @@ export class HomeNavigation extends Component {
         }}>
         <HomeTab.Screen
           name="Videos"
-          component={VideoFeedRecyclerList}
-          initialParams={{
-            setRoute: this.set_active_route,
-          }}
+          component={FeedScreen}
+          initialParams={{}}
         />
         {/* <HomeTab.Screen
           name="Topics"
           component={TopicStackNavigator}
-          initialParams={{
-            setRoute: this.set_active_route,
-          }}
+          initialParams={{}}
         /> */}
       </HomeTab.Navigator>
     );

@@ -77,7 +77,7 @@ class TopicFeed extends Component {
       this.setState({category: category});
     }
   }
-  componentWillReceiveProps(prevProps) {
+  UNSAFE_componentWillReceiveProps(prevProps) {
     if (this.state.focused) {
       const {isRefresh} = this.props.route.params
         ? this.props.route.params

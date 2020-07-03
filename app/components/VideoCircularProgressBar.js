@@ -7,27 +7,28 @@ import {DownloadIcon} from '../constants/icon';
 // create a component
 class VideoCircularProgressBar extends Component {
   render() {
-    const {current, total} = this.props;
+    const {size, current, total, style} = this.props;
     return (
       <AnimatedCircularProgress
-        size={50}
+        size={size ? size : 50}
         width={3}
         fill={current ? (1 - current / total) * 100 : 100}
-        tintColor="black"
-        backgroundColor="#FFFFFF">
+        tintColor="#FF644E"
+        backgroundColor="#999"
+        style={style ? style : {}}>
         {fill => (
           <View
             style={{
               backgroundColor: 'white',
-              height: 50,
-              width: 50,
+              height: size ? size : 50,
+              width: size ? size : 50,
               alignItems: 'center',
               justifyContent: 'center',
             }}>
             <Text
               adjustsFontSizeToFit={true}
               style={{
-                fontSize: 20,
+                fontSize: 16,
                 color: 'black',
                 fontWeight: 'bold',
               }}>
@@ -49,7 +50,7 @@ export class DownloadCircularBar extends Component {
         size={a_size}
         width={3}
         fill={current ? (1 - current / total) * 100 : 100}
-        tintColor="white"
+        tintColor="#FF644E"
         backgroundColor="#999">
         {fill => (
           <View

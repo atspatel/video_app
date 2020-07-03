@@ -17,10 +17,14 @@ export class ProfilePic extends Component {
       isSingleImage ? (
         <SingleImage
           uri={profile_pic}
-          style={[
-            styles.image_stretch,
-            {width: img_size, height: img_size, borderRadius: radius},
-          ]}
+          style={{
+            resizeMode: 'cover',
+            borderWidth: 1,
+            borderColor: 'black',
+            width: img_size,
+            height: img_size,
+            borderRadius: radius,
+          }}
         />
       ) : (
         <Image

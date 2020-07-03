@@ -1,5 +1,4 @@
 import Video from 'react-native-video';
-import YouTube from 'react-native-youtube';
 //import liraries
 import React, {Component} from 'react';
 import {
@@ -8,20 +7,187 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
-  Image,
+  BackHandler,
 } from 'react-native';
+import {connect} from 'react-redux';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {AnimatedCircularProgress} from 'react-native-circular-progress';
 import FollowButton from './FollowButtonTwo';
 import ProfilePic from './ProfilePic';
-import WebViewer from '../screens/WebViewer';
+import UserVideoBottomFeed from './UserVideoBottomFeed';
 import {setVolume} from '../functions/SystemFunctions';
 import * as RootNavigationRef from '../../RootNavigationRef';
-
-import * as config from '../../config';
+import {LikeIcon} from '../constants/icon';
+import ShareButton from './ShareButton';
+import VideoCircularProgressBar from './VideoCircularProgressBar';
 
 const {width: winWidth, height: winHeight} = Dimensions.get('window');
+
+class VideoPlayerSideBar extends Component {
+  state = {
+    volume: 0,
+    isSharing: false,
+  };
+
+  onVoumeChange = () => {
+    this.props.setVolume(Number(!this.state.volume));
+  };
+
+  onClickLike = (id, action) => {
+    if (this.props.onClickLike) {
+      this.props.onClickLike(id, action);
+    }
+  };
+
+  componentDidUpdate() {
+    const {volume} = this.props;
+    if (this.state.volume != volume) {
+      this.setState({volume: this.props.volume});
+    }
+  }
+
+  componentDidMount() {
+    this.componentDidUpdate();
+  }
+
+  render() {
+    const {volume} = this.props;
+    const {video_info, current, total} = this.props;
+    return (
+      <View style={[styles.sidebar]}>
+        <ShareButton video_info={video_info} />
+        <TouchableOpacity
+          onPress={() =>
+            this.onClickLike(
+              video_info.id,
+              video_info.liked ? 'unlike' : 'like',
+            )
+          }
+          style={{marginVertical: 5}}>
+          <View
+            style={{
+              alignSelf: 'center',
+              alignItems: 'center',
+              backgroundColor: video_info.liked ? 'lightblue' : 'white',
+              borderRadius: 20,
+            }}>
+            <LikeIcon size={30} color="black" />
+            {video_info.likes > 0 ? (
+              <Text
+                allowFontScaling={true}
+                style={{marginTop: -5, paddingBottom: 5}}>
+                {video_info.likes}
+              </Text>
+            ) : null}
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={this.onVoumeChange}
+          style={{marginVertical: 5}}>
+          <MaterialCommunityIcons
+            name={volume ? 'volume-high' : 'volume-off'}
+            // size={35}
+            // color={'white'}
+            size={30}
+            color="black"
+            style={{
+              padding: 5,
+              alignSelf: 'center',
+              alignItems: 'center',
+              backgroundColor: 'white',
+              borderRadius: 20,
+            }}
+          />
+        </TouchableOpacity>
+        <VideoCircularProgressBar
+          size={40}
+          current={current}
+          total={total}
+          style={{marginTop: 5}}
+        />
+        {/* <AnimatedCircularProgress
+          size={40}
+          width={3}
+          fill={current ? (1 - current / total) * 100 : 100}
+          tintColor="#FF644E"
+          backgroundColor="#999"
+          style={{marginTop: 5}}
+        /> */}
+      </View>
+    );
+  }
+}
+const mapStateToProps = state => ({
+  volume: state.SystemReducer.volume,
+});
+const ConnectedVideoPlayerSideBar = connect(mapStateToProps, {setVolume})(
+  VideoPlayerSideBar,
+);
+
+class VideoPlayerBottomBar extends Component {
+  onClickUser = user_info => {
+    RootNavigationRef.navigate('CreatorProfile', {user: user_info.id});
+  };
+  render() {
+    const {isOpen, onClick, title, user_info} = this.props;
+    return (
+      <View style={styles.overlay_bar}>
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            flexDirection: 'row',
+            paddingVertical: 5,
+            alignItems: 'center',
+          }}
+          onPress={onClick}>
+          <TouchableOpacity onPress={() => this.onClickUser(user_info)}>
+            <ProfilePic
+              profile_pic={user_info.profile_pic}
+              user_name={user_info.name}
+              size={50}
+            />
+          </TouchableOpacity>
+
+          <View
+            style={{
+              flex: 1,
+              margin: 5,
+            }}>
+            <Text style={styles.title_text} numberOfLines={1}>
+              {title}
+            </Text>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text
+                style={{
+                  flex: 1,
+                  color: 'black',
+                  fontSize: 16,
+                  fontFamily: 'serif',
+                  marginLeft: 5,
+                }}
+                numberOfLines={1}>
+                {user_info.name.substring(0, 15)}
+              </Text>
+              <View
+                style={{
+                  flex: 1,
+                }}>
+                <FollowButton
+                  style={{width: 80}}
+                  qid={user_info.id}
+                  qcat={'user'}
+                  isSelf={user_info.follow_status == 'self' ? true : false}
+                />
+              </View>
+            </View>
+          </View>
+        </TouchableOpacity>
+        {isOpen ? <UserVideoBottomFeed user_id={user_info.id} /> : null}
+      </View>
+    );
+  }
+}
 
 class VideoPlayerComp extends Component {
   constructor(props) {
@@ -36,19 +202,21 @@ class VideoPlayerComp extends Component {
 
       displayUrl: null,
       showButton: false,
+      isBottomBarOpen: false,
     };
 
     this.toggle_pause = this.toggle_pause.bind();
   }
 
+  toggleBottomMenu = () => {
+    this.setState({isBottomBarOpen: !this.state.isBottomBarOpen});
+  };
   openURL(url) {
     RootNavigationRef.navigate('WebViewer', {url: url});
   }
 
   onEnd = () => {
-    if (this.props.video_info.source !== 'youtube') {
-      this.player.seek(0);
-    }
+    this.player.seek(0);
     this.setState({paused: true});
     if (this.props.onEnd) {
       this.props.onEnd();
@@ -58,38 +226,11 @@ class VideoPlayerComp extends Component {
     this.setState({paused: !this.state.paused});
   };
 
-  onVoumeChange = () => {
-    this.props.setVolume(Number(!this.state.volume));
-  };
-
-  onClickUser = user_info => {
-    if (this.props.onClickUser) {
-      return this.props.onClickUser(user_info);
-    }
-  };
-
-  onClickFollow = (action, user_info) => {
-    if (this.props.onClickFollow) {
-      return this.props.onClickFollow(action, user_info);
-    }
-  };
-
   handleOnLoad = meta => {
     this.setState({duration: meta.duration});
   };
 
-  onReadyYoutube = () => {
-    this.player.getDuration().then(duration => {
-      this.setState({duration: duration});
-    });
-  };
-  onChangeStateYoutube = e => {
-    this.player.getCurrentTime().then(currentTime => {
-      if (currentTime != 0) {
-        this.state.duration - currentTime === 0 ? this.onEnd() : null;
-      }
-    });
-  };
+  onBuffer = () => {};
 
   handleProgress = progress => {
     this.setState({
@@ -97,14 +238,6 @@ class VideoPlayerComp extends Component {
     });
   };
 
-  // onPlayForward = () => {
-  //   let curr = Math.min(this.state.current + 5, this.state.duration);
-  //   this.player.seek(parseInt(curr));
-  // };
-  // onPlayBackward = () => {
-  //   let curr = Math.max(this.state.current - 5, 0);
-  //   this.player.seek(parseInt(curr));
-  // };
   componentDidUpdate(prevProps) {
     const {duration, current, showButton, displayUrl} = this.state;
     if (duration && duration - current < 15 && !showButton && displayUrl) {
@@ -115,13 +248,22 @@ class VideoPlayerComp extends Component {
     }
     if (prevProps.paused !== this.props.paused) {
       this.setState({paused: this.props.paused}, () => {
-        this.props.video_info.source != 'youtube' && this.player.seek(0);
+        this.player.seek(0);
       });
     }
     if (this.state.volume != this.props.volume) {
       this.setState({volume: this.props.volume});
     }
   }
+
+  handleBackButtonClick = () => {
+    if (this.state.isBottomBarOpen) {
+      this.setState({isBottomBarOpen: false});
+      return true;
+    }
+    return false;
+  };
+
   componentDidMount() {
     const displayUrl = this.props.video_info.external_urls;
     this.setState({
@@ -129,205 +271,87 @@ class VideoPlayerComp extends Component {
       volume: this.props.volume,
       displayUrl: displayUrl,
     });
+    // this.backHandler = BackHandler.addEventListener(
+    //   'hardwareBackPress',
+    //   this.handleBackButtonClick,
+    // );
+  }
+  componentWillUnmount() {
+    // this.backHandler && this.backHandler.remove();
   }
 
-  renderYTPlayer() {
+  renderVideoPlayer() {
     const {video_info, height} = this.props;
+    const {paused, volume} = this.state;
     return (
-      <YouTube
+      <Video
         ref={c => (this.player = c)}
-        apiKey={config.google_key}
-        videoId={video_info.video_id} // The YouTube video ID
-        play
-        // controls={0}
-        showFullscreenButton={false}
-        onReady={this.onReadyYoutube}
-        onChangeState={this.onChangeStateYoutube}
+        source={{uri: video_info.url}}
+        hls={true}
+        resizeMode="contain"
+        onLoad={this.handleOnLoad}
+        progressUpdateInterval={500.0}
+        onProgress={this.handleProgress}
+        onBuffer={this.onBuffer}
+        poster={video_info.thumbnail_image}
+        posterResizeMode={'stretch'}
         style={{
-          alignSelf: 'stretch',
           width: winWidth,
-          height: height - 50,
+          height: height - 20,
+          borderRadius: 10,
+          backgroundColor: 'black',
         }}
-        onError={e => console.log(e)}
+        bufferConfig={{minBufferMs: 1000, maxBufferMs: 5000}}
+        paused={paused}
+        onEnd={this.onEnd}
+        volume={volume}
+        maxBitRate={0}
       />
     );
   }
-  renderVideoPlayer() {
-    const {video_info, height} = this.props;
-    const {paused, showButton, displayUrl, volume} = this.state;
-    return (
-      <TouchableOpacity onPress={this.toggle_pause} activeOpacity={0.9}>
-        <Video
-          ref={c => (this.player = c)}
-          source={{uri: video_info.url}}
-          hls={true}
-          resizeMode="contain"
-          onLoad={this.handleOnLoad}
-          progressUpdateInterval={500.0}
-          onProgress={this.handleProgress}
-          poster={video_info.thumbnail_image}
-          posterResizeMode={'stretch'}
-          style={{
-            width: winWidth,
-            height: height,
-            borderRadius: 10,
-            backgroundColor: 'black',
-          }}
-          bufferConfig={{minBufferMs: 1000, maxBufferMs: 5000}}
-          paused={paused}
-          onEnd={this.onEnd}
-          volume={volume}
-          maxBitRate={0}></Video>
-        {paused ? (
-          <View style={styles.overlay_play}>
-            <MaterialCommunityIcons name={'play'} color="white" size={100} />
-          </View>
-        ) : null}
-        {showButton ? (
-          <View style={styles.overlay_button}>
-            <TouchableOpacity
-              style={{
-                backgroundColor: '#DDD',
-                padding: 5,
-                paddingHorizontal: 20,
-                borderRadius: 10,
-              }}
-              onPress={() => {
-                this.openURL(displayUrl);
-              }}>
-              <Text style={{fontSize: 20, fontFamily: 'serif'}}>
-                Watch More Here
-              </Text>
-            </TouchableOpacity>
-          </View>
-        ) : null}
-      </TouchableOpacity>
-    );
-  }
   render() {
-    const {video_info, paused, onEnd, height} = this.props;
-    const isYouTube = video_info.source === 'youtube' ? true : false;
-    const {volume, displayUrl} = this.state;
+    const {video_info, height, onClickLike} = this.props;
+    const {paused, volume, showButton, displayUrl} = this.state;
     return (
       <View style={[styles.container, {height: height}]}>
-        {isYouTube && !paused
-          ? this.renderYTPlayer()
-          : this.renderVideoPlayer()}
-        <View style={styles.overlay_bar}>
-          <View style={{flex: 1, justifyContent: 'center'}}>
-            {isYouTube ? null : (
-              <TouchableOpacity onPress={this.onVoumeChange}>
-                <MaterialCommunityIcons
-                  name={volume ? 'volume-high' : 'volume-off'}
-                  size={35}
-                  color={'white'}
-                  style={{paddingLeft: 20}}
-                />
-              </TouchableOpacity>
-            )}
-          </View>
-          <View
-            style={{
-              // flex: 1,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            {isYouTube ? null : (
-              <AnimatedCircularProgress
-                size={50}
-                width={3}
-                fill={
-                  this.state.current
-                    ? (1 - this.state.current / this.state.duration) * 100
-                    : 100
-                }
-                tintColor="white"
-                backgroundColor="#999">
-                {fill => (
-                  <View
-                    style={{
-                      backgroundColor: '#999',
-                      height: 50,
-                      width: 50,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                    <Text
-                      adjustsFontSizeToFit={true}
-                      style={{
-                        fontSize: 20,
-                        color: 'black',
-                        fontWeight: 'bold',
-                      }}>
-                      {parseInt(this.state.duration - this.state.current)}
-                    </Text>
-                  </View>
-                )}
-              </AnimatedCircularProgress>
-            )}
-          </View>
-          <TouchableOpacity
-            onPress={() => {
-              this.onClickUser(video_info.user);
-            }}
-            activeOpacity={0.7}
-            style={{
-              flexDirection: 'row',
-              flex: 1,
-              alignItems: 'center',
-              marginRight: 10,
-              borderRadius: 20,
-              justifyContent: 'flex-end',
-              backgroundColor: '#DDD',
-              overflow: 'hidden',
-            }}>
-            <View>
-              <Text
-                style={{color: 'black', justifyContent: 'center'}}
-                numberOfLines={1}>
-                {video_info.user.name.substring(0, 15)}
-              </Text>
-              <View
+        <TouchableOpacity onPress={this.toggle_pause} activeOpacity={0.9}>
+          {this.renderVideoPlayer()}
+          {paused ? (
+            <View style={styles.overlay_play}>
+              <MaterialCommunityIcons name={'play'} color="white" size={100} />
+            </View>
+          ) : null}
+          {showButton ? (
+            <View style={styles.overlay_button}>
+              <TouchableOpacity
                 style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  backgroundColor: '#DDD',
+                  padding: 5,
+                  paddingHorizontal: 20,
+                  borderRadius: 10,
+                }}
+                onPress={() => {
+                  this.openURL(displayUrl);
                 }}>
-                <Text style={{color: 'black', marginRight: 3}}>
-                  {video_info.user.followers ? video_info.user.followers : 0}
+                <Text style={{fontSize: 20, fontFamily: 'serif'}}>
+                  Watch More Here
                 </Text>
-                <FollowButton
-                  style={{width: 80}}
-                  qid={video_info.user.id}
-                  qcat={'user'}
-                  isSelf={
-                    video_info.user.follow_status == 'self' ? true : false
-                  }
-                />
-                {/* <FontAwesome5 name="users" size={15} color={'black'} /> */}
-              </View>
+              </TouchableOpacity>
             </View>
-            <View
-              style={{
-                // flex: 1,
-                height: 50,
-                width: 50,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 25,
-                backgroundColor: 'white',
-                borderWidth: 2,
-                borderColor: 'black',
-              }}>
-              <ProfilePic
-                profile_pic={video_info.user.profile_pic}
-                user_name={video_info.user.name}
-                size={44}
-              />
-            </View>
-          </TouchableOpacity>
-        </View>
+          ) : null}
+        </TouchableOpacity>
+        <ConnectedVideoPlayerSideBar
+          video_info={video_info}
+          current={this.state.current}
+          total={this.state.duration}
+          onClickLike={onClickLike}
+        />
+        <VideoPlayerBottomBar
+          isOpen={this.state.isBottomBarOpen}
+          onClick={this.toggleBottomMenu}
+          title={video_info.title}
+          user_info={video_info.user}
+        />
       </View>
     );
   }
@@ -364,25 +388,38 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   overlay_bar: {
-    height: 50,
     width: '100%',
-    flexDirection: 'row',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    paddingHorizontal: 10,
+    overflow: 'hidden',
     position: 'absolute',
-    // paddingBottom: 10,
     bottom: 0,
     right: 0,
     opacity: 1.0,
-    backgroundColor: 'rgba(0, 0,  0, 0.3)',
+    backgroundColor: 'rgba(255, 255, 255, 1.0)',
+  },
+  sidebar: {
+    width: 60,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    overflow: 'hidden',
+
+    position: 'absolute',
+    bottom: 70,
+    right: 20,
+    opacity: 1.0,
+    backgroundColor: 'rgba(0, 0,  0, 0.2)',
+  },
+  title_text: {
+    fontFamily: 'serif',
+    fontSize: 14,
+    color: 'black',
   },
 });
 
 //make this component available to the app
 // export default VideoPlayerComp;
-
-import {connect} from 'react-redux';
-
-const mapStateToProps = state => ({
-  volume: state.SystemReducer.volume,
-});
-
-export default connect(mapStateToProps, {setVolume})(VideoPlayerComp);
+export default connect(mapStateToProps, {})(VideoPlayerComp);

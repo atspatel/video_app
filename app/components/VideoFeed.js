@@ -1,6 +1,12 @@
 //import liraries
 import React, {Component} from 'react';
-import {View, StyleSheet, Dimensions, RefreshControl} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  RefreshControl,
+  ScrollView,
+} from 'react-native';
 import {connect} from 'react-redux';
 import GestureRecognizer from 'react-native-swipe-gestures';
 
@@ -162,12 +168,19 @@ class VideoFeed extends Component {
           var {x, y, width, height} = event.nativeEvent.layout;
           this.setState({width: width, height: height});
         }}>
-        <GestureRecognizer
-          onSwipeRight={this.onSwipeRight}
-          config={config}
-          style={{flex: 1, backgroundColor: 'white'}}>
-          {/* show Empty List Message */}
-        </GestureRecognizer>
+        <ScrollView
+          contentContainerStyle={{flexGrow: 1}}
+          scrollEnabled={false}
+          refreshControl={
+            onRefresh ? (
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            ) : null
+          }>
+          <GestureRecognizer
+            onSwipeRight={this.onSwipeRight}
+            config={config}
+            style={{flex: 1, backgroundColor: 'white'}}></GestureRecognizer>
+        </ScrollView>
       </View>
     );
   }

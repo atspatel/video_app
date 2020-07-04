@@ -158,7 +158,7 @@ export class CategoryModal extends Component {
                 key={item.id.toString()}
                 title={item}
                 onClick={onSelectCategory}
-                isSelected={item.id === category.id ? true : false}
+                isSelected={category && item.id === category.id ? true : false}
               />
             );
           })}

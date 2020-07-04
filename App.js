@@ -13,6 +13,9 @@ import PushController from './app/components/PushController';
 import fixTextCutOff from './font_fix';
 fixTextCutOff();
 
+import {YellowBox} from 'react-native';
+YellowBox.ignoreWarnings(['Require cycle:']);
+
 class App extends Component {
   render() {
     return (

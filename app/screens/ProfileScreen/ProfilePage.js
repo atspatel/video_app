@@ -59,7 +59,7 @@ class UserInfo extends Component {
             @{user_data.username}
           </Text>
           <Text style={[styles.user_text, {fontSize: 12}]} numberOfLines={2}>
-            {user_data.bio} {user_data.bio} {user_data.bio}
+            {user_data.bio}
           </Text>
         </TouchableOpacity>
         {isCollapsed ? (

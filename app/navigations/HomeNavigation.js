@@ -43,7 +43,7 @@ export class HomeNavigation extends Component {
         tabBarOptions={{
           inactiveTintColor: 'gray',
           showLabel: false,
-          style: {height: 5, backgroundColor: 'black'},
+          style: {height: 0, backgroundColor: 'black'},
           indicatorStyle: {
             height: 2,
             backgroundColor: 'white',

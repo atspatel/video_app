@@ -302,7 +302,6 @@ class VideoPlayerComp extends Component {
         style={{
           width: winWidth,
           height: height - 20,
-          borderRadius: 10,
           backgroundColor: 'black',
         }}
         bufferConfig={{minBufferMs: 1000, maxBufferMs: 5000}}

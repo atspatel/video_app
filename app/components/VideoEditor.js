@@ -14,12 +14,13 @@ import Modal from 'react-native-modal';
 import {Chip} from 'react-native-paper';
 import ParsedText from 'react-native-parsed-text';
 
-import SelectLangCat from './SelectLangCat';
+import ChoiceComponent from './ChoiceComponent';
 import {VideoPlayerModal} from './VideoDraft';
 import {get_options} from '../functions/CategoryFunctions';
 import {LanguageIcon, CategoryIcon, AddIcon} from '../constants/icon';
 import * as chipHelperFun from '../functions/formChoiceChipHelpers';
 import {upload_video_data} from '../functions/VideoUploadApi';
+import * as theme from '../constants/theme';
 
 const maxChipItemDisplayLen = 20;
 
@@ -60,12 +61,12 @@ export class SelectModal extends Component {
             alignItems: 'stretch',
             justifyContent: 'center',
           }}>
-          <SelectLangCat
+          <ChoiceComponent
+            small={true}
             title={'Video Attributes'}
-            show_instruction={false}
             languages={languages}
             categories={categories}
-            updateList={onUpdateList}
+            onUpdateList={onUpdateList}
           />
           <TouchableOpacity onPress={closeModal}>
             <Text
@@ -74,7 +75,7 @@ export class SelectModal extends Component {
                 textAlign: 'center',
                 padding: 10,
                 marginHorizontal: 50,
-                fontFamily: 'serif',
+                fontFamily: theme.fontFamily,
                 fontWeight: 'bold',
                 fontSize: 18,
                 borderRadius: 10,
@@ -98,51 +99,37 @@ class VideoEditor extends Component {
       error: false,
     },
     url: null,
-    editorHeight: null,
+
     languages: {
-      options_list: {},
-      selected_list: {},
-      error: false,
+      itemList: [],
+      error: null,
     },
     categories: {
-      options_list: {},
-      selected_list: {},
-      error: false,
+      itemList: [],
+      error: null,
     },
   };
-  updateList = (key, selected_list, options_list) => {
+  onUpdateList = (itemList, category) => {
     this.setState({
-      [key]: {
-        ...this.state[key],
-        selected_list: selected_list,
-        options_list: options_list,
-        error: false,
-      },
+      [category]: {...this.state[category], itemList: itemList, error: false},
     });
   };
 
-  array_to_object(array) {
-    let new_obj = {};
-    array.map(item => {
-      new_obj[item.id] = item.tag;
-    });
-    return new_obj;
-  }
   update_options = () => {
     get_options().then(response => {
-      let languages_options = this.array_to_object(response.languages_options);
-      let categories_options = this.array_to_object(
-        response.categories_options,
-      );
+      let language_itemList = response.languages_options.map(item => {
+        return {...item, selected: false};
+      });
+      let category_itemList = response.categories_options.map(item => {
+        return {...item, selected: false};
+      });
       this.setState({
         languages: {
-          options_list: languages_options,
-          selected_list: {},
+          itemList: language_itemList,
           error: false,
         },
         categories: {
-          options_list: categories_options,
-          selected_list: {},
+          itemList: category_itemList,
           error: false,
         },
       });
@@ -160,15 +147,23 @@ class VideoEditor extends Component {
   validateForm = () => {
     let isValid = true;
     const {title, languages, categories} = this.state;
+
     if (!title.text || title.text.length == 0) {
       isValid = false;
       this.setState({title: {...title, error: true}});
     }
-    if (Object.keys(languages.selected_list).length == 0) {
+
+    const lang_selected_list = languages.itemList.filter(
+      item => item.selected === true,
+    );
+    const cat_selected_list = categories.itemList.filter(
+      item => item.selected === true,
+    );
+    if (lang_selected_list.length == 0) {
       isValid = false;
       this.setState({languages: {...languages, error: true}});
     }
-    if (Object.keys(categories.selected_list).length == 0) {
+    if (cat_selected_list.length == 0) {
       isValid = false;
       this.setState({categories: {...categories, error: true}});
     }
@@ -182,8 +177,12 @@ class VideoEditor extends Component {
         this.props.Token,
         video_info,
         title.text,
-        languages.selected_list,
-        categories.selected_list,
+        languages.itemList
+          .filter(item => item.selected === true)
+          .map(item => item.tag),
+        categories.itemList
+          .filter(item => item.selected === true)
+          .map(item => item.tag),
         url,
         this.updateVideoList,
       );
@@ -191,12 +190,9 @@ class VideoEditor extends Component {
     }
   };
   onChangeTitle = text => {
-    // console.warn(text);
     this.setState({title: {text: text, error: false}});
   };
-  onKeyPress = e => {
-    //   console.warn(e.nativeEvent.key)
-  };
+  onKeyPress = e => {};
 
   addHashtag = () => {
     const title = this.state.title ? this.state.title : {text: null};
@@ -220,17 +216,24 @@ class VideoEditor extends Component {
   render_chips(chipList) {
     return (
       <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap'}}>
-        {Object.keys(chipList).map(item => {
+        {chipList.map(item => {
           return (
             <Chip
-              key={item}
-              icon="checkbox-marked-circle-outline"
+              key={item.id}
+              avatar={
+                <Image
+                  source={{uri: item.thumbnail}}
+                  style={{
+                    height: 20,
+                    width: 20,
+                    resizeMode: 'cover',
+                    borderRadius: 5,
+                  }}
+                />
+              }
               style={styles.selected_chip_style}
               textStyle={[styles.selected_chip_text_style]}>
-              {chipHelperFun._getItemString(
-                chipList[item],
-                maxChipItemDisplayLen,
-              )}
+              {chipHelperFun._getItemString(item.tag, maxChipItemDisplayLen)}
             </Chip>
           );
         })}
@@ -241,12 +244,19 @@ class VideoEditor extends Component {
   render() {
     const {video_info} = this.props.route.params;
     const {title, languages, categories} = this.state;
+
+    const lang_selected_list = languages.itemList.filter(
+      item => item.selected === true,
+    );
+    const cat_selected_list = categories.itemList.filter(
+      item => item.selected === true,
+    );
     return video_info ? (
       <View style={styles.container}>
         <SelectModal
           isVisible={this.state.isSelectVisible}
           closeModal={this.closeSelectModal}
-          onUpdateList={this.updateList}
+          onUpdateList={this.onUpdateList}
           position={'flex-end'}
           languages={languages}
           categories={categories}
@@ -279,8 +289,8 @@ class VideoEditor extends Component {
                     margin: 5,
                   }}>
                   <LanguageIcon color={languages.error ? 'red' : 'black'} />
-                  {Object.keys(languages.selected_list).length > 0
-                    ? this.render_chips(languages.selected_list)
+                  {lang_selected_list.length > 0
+                    ? this.render_chips(lang_selected_list)
                     : this.render_add()}
                 </View>
                 <View
@@ -290,8 +300,8 @@ class VideoEditor extends Component {
                     margin: 5,
                   }}>
                   <CategoryIcon color={categories.error ? 'red' : 'black'} />
-                  {Object.keys(categories.selected_list).length > 0
-                    ? this.render_chips(categories.selected_list)
+                  {cat_selected_list.length > 0
+                    ? this.render_chips(cat_selected_list)
                     : this.render_add()}
                 </View>
               </View>
@@ -333,7 +343,7 @@ class VideoEditor extends Component {
             },
           ]}>
           {/* <ParsedText
-            style={{fontFamily: 'serif', fontSize: 20, lineHeight: 25}}
+            style={{fontFamily: theme.fontFamily, fontSize: 20, lineHeight: 25}}
             parse={[
               {type: 'url', style: styles.url},
               {pattern: /#(\w+)/, style: styles.hashTag},
@@ -351,16 +361,16 @@ class VideoEditor extends Component {
         />
         <View
           style={{
-            flexDirection: 'row',
+            // flexDirection: 'row',
             justifyContent: 'space-between',
             marginHorizontal: 10,
           }}>
           {/* <TouchableOpacity onPress={this.addHashtag}>
             <Text style={styles.hlink}>Add #Tags</Text>
           </TouchableOpacity> */}
-          <View></View>
+          {/* <View></View> */}
           <TouchableOpacity onPress={this.onPost}>
-            <Text style={styles.button}>Post</Text>
+            <Text style={styles.button_style}>Post</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -383,18 +393,18 @@ const styles = StyleSheet.create({
   textinput_style: {
     borderBottomWidth: 1,
     alignSelf: 'stretch',
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
     fontSize: 20,
     lineHeight: 25,
   },
   hlink: {
     color: 'blue',
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
     fontWeight: 'bold',
     margin: 10,
   },
   button: {
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
     fontWeight: 'bold',
     textAlignVertical: 'center',
     padding: 10,
@@ -416,7 +426,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   selected_chip_style: {
-    backgroundColor: 'lightblue',
+    fontFamily: theme.fontFamily,
+    fontSize: 12,
+    backgroundColor: theme.logoColor,
     marginHorizontal: 2,
     marginVertical: 2,
     borderColor: 'black',
@@ -428,6 +440,18 @@ const styles = StyleSheet.create({
   },
   hashTag: {
     color: 'blue',
+  },
+  button_style: {
+    fontFamily: theme.fontFamily,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: 'white',
+    fontSize: 18,
+    backgroundColor: 'black',
+    marginTop: 20,
+    marginHorizontal: 25,
+    padding: 5,
+    borderRadius: 10,
   },
 });
 

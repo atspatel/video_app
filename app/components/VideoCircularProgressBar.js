@@ -4,6 +4,8 @@ import {View, Text, StyleSheet} from 'react-native';
 import {AnimatedCircularProgress} from 'react-native-circular-progress';
 import {DownloadIcon} from '../constants/icon';
 
+import * as theme from '../constants/theme';
+
 // create a component
 class VideoCircularProgressBar extends Component {
   render() {
@@ -13,30 +15,9 @@ class VideoCircularProgressBar extends Component {
         size={size ? size : 50}
         width={3}
         fill={current ? (1 - current / total) * 100 : 100}
-        tintColor="#FF644E"
-        backgroundColor="#999"
-        style={style ? style : {}}>
-        {fill => (
-          <View
-            style={{
-              backgroundColor: 'white',
-              height: size ? size : 50,
-              width: size ? size : 50,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <Text
-              adjustsFontSizeToFit={true}
-              style={{
-                fontSize: 16,
-                color: 'black',
-                fontWeight: 'bold',
-              }}>
-              {parseInt(total - current)}
-            </Text>
-          </View>
-        )}
-      </AnimatedCircularProgress>
+        tintColor={theme.logoColor}
+        style={style ? style : {}}
+      />
     );
   }
 }
@@ -50,7 +31,7 @@ export class DownloadCircularBar extends Component {
         size={a_size}
         width={3}
         fill={current ? (1 - current / total) * 100 : 100}
-        tintColor="#FF644E"
+        tintColor={theme.logoColor}
         backgroundColor="#999">
         {fill => (
           <View

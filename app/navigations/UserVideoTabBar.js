@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 
 import UserPosts from '../screens/ProfileScreen/UserPosts';
-import UserTopics from '../screens/ProfileScreen/UserTopics';
+import * as theme from '../constants/theme';
 
 const UserTab = createMaterialTopTabNavigator();
 class UserVideoTabBar extends Component {
@@ -28,7 +28,7 @@ class UserVideoTabBar extends Component {
             height: 30,
             marginTop: 0,
             fontSize: 15,
-            fontFamily: 'serif',
+            fontFamily: theme.fontFamily,
             textAlign: 'center',
             textTransform: 'none',
           },
@@ -47,17 +47,6 @@ class UserVideoTabBar extends Component {
             qid: user_id ? user_id : null,
           }}
         />
-        {/* <UserTab.Screen
-          name="Channels"
-          component={UserTopics}
-          initialParams={{onScroll: onScroll, qcat: 'user'}}
-        /> */}
-
-        {/* <UserTab.Screen
-          name="Re-posts"
-          component={VideoThumbnailFeed}
-          initialParams={{onScroll: onScroll, qcat: 'user_repost'}}
-        /> */}
       </UserTab.Navigator>
     );
   }

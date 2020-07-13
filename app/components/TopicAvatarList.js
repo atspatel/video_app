@@ -14,6 +14,8 @@ import {RecyclerListView, DataProvider, LayoutProvider} from 'recyclerlistview';
 import * as RootNavigationRef from '../../RootNavigationRef';
 import FollowButton from './FollowButton';
 import {get_topic_data} from '../functions/CategoryFunctions';
+
+import * as theme from '../constants/theme';
 const HEIGHT = 160;
 const WIDTH = 130;
 // create a component
@@ -217,12 +219,12 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   avatar_name: {
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
     fontWeight: 'bold',
   },
   userLabel: {
     fontSize: 18,
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
     paddingHorizontal: 5,
   },
 });

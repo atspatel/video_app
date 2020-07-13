@@ -12,8 +12,8 @@ import GestureRecognizer from 'react-native-swipe-gestures';
 
 import VideoPlayerComp from './VideoPlayerComp';
 import {RecyclerListView, DataProvider, LayoutProvider} from 'recyclerlistview';
+import * as theme from '../constants/theme';
 
-import * as RootNavigationRef from '../../RootNavigationRef';
 const ViewTypes = {
   VideoFeedCard: 0,
 };
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
   },
   title_text: {
     marginTop: 5,
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
     fontSize: 18,
     lineHeight: 20,
     maxHeight: 65,

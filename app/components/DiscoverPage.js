@@ -1,13 +1,14 @@
 //import liraries
 import React, {Component} from 'react';
 import {View, StyleSheet} from 'react-native';
-import {SearchBar} from 'react-native-elements';
+import {SearchBar, Icon} from 'react-native-elements';
 import debounce from 'lodash.debounce';
 
+import Collapsible from 'react-native-collapsible';
+
 import UserAvatarList from './UserAvatarList';
-// import ChannelAvatarList from './ChannelAvatarList';
-import TopicAvatarList from './TopicAvatarList';
 import VideoAvatarList from './VideoAvatarList';
+import * as theme from '../constants/theme';
 
 // create a component
 class DiscoverPage extends Component {
@@ -18,7 +19,8 @@ class DiscoverPage extends Component {
   }
   state = {
     search: '',
-    debounce_search: null,
+    debounce_search: '',
+    isCollapsed: false,
   };
 
   call_search = () => {
@@ -31,33 +33,52 @@ class DiscoverPage extends Component {
   onClickUser = user_id => {
     this.props.navigation.navigate('CreatorProfile', {user: user_id});
   };
-  onClickTopic = id => {
-    this.props.navigation.navigate('TopicScreen', {topic: id});
+
+  onScroll = (e, offsetX, offsetY) => {
+    if (offsetY === 0) {
+      this.setState({isCollapsed: false});
+    } else {
+      this.setState({isCollapsed: true});
+    }
   };
   componentDidMount() {}
   componentWillUnmount() {}
   render() {
-    const {search} = this.state;
+    const {search, isCollapsed} = this.state;
     return (
       <View style={styles.container}>
         <SearchBar
           placeholder="Search..."
           onChangeText={this.updateSearch}
           value={search}
-          containerStyle={{backgroundColor: 'white', padding: 0}}
-          inputStyle={{color: 'white'}}
+          lightTheme
+          round
+          containerStyle={{
+            padding: 5,
+            paddingHorizontal: 10,
+            backgroundColor: '#DDD',
+          }}
+          inputContainerStyle={{
+            backgroundColor: 'white',
+            padding: 0,
+            borderRadius: 20,
+          }}
+          inputStyle={{color: 'black'}}
+          searchIcon={<Icon name="search" color="black" size={30} />}
         />
-        <UserAvatarList
-          label={'Users'}
-          searchText={this.state.debounce_search}
-          onClick={this.onClickUser}
-        />
+        <Collapsible collapsed={isCollapsed}>
+          <UserAvatarList
+            label={'Users'}
+            searchText={this.state.debounce_search}
+            onClick={this.onClickUser}
+          />
+        </Collapsible>
         <VideoAvatarList
-          label={'Trending Videos'}
+          label={'Trending'}
           qcat={'discover'}
           searchText={this.state.debounce_search}
           qid={1}
-          onClick={this.onClickTopic}
+          onScroll={this.onScroll}
         />
       </View>
     );
@@ -75,19 +96,6 @@ const styles = StyleSheet.create({
     width: 70,
     resizeMode: 'cover',
     borderRadius: 40,
-  },
-  avatar_name: {
-    fontFamily: 'serif',
-    fontWeight: 'bold',
-  },
-  follow_count: {
-    fontFamily: 'serif',
-  },
-  follow_button: {
-    fontFamily: 'serif',
-    padding: 5,
-    backgroundColor: 'red',
-    borderRadius: 5,
   },
 });
 

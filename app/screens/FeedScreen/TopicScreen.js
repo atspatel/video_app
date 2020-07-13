@@ -5,7 +5,7 @@ import {View, Text, StyleSheet} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import VideoThumbnailFeed from '../../components/VideoThumbnailFeed';
 import FollowButton from '../../components/FollowButton';
-
+import * as theme from '../../constants/theme';
 // create a component
 class TopicScreen extends Component {
   state = {
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   title: {
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
     fontSize: 20,
     marginVertical: 5,
   },

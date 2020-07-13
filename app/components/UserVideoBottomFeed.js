@@ -11,6 +11,7 @@ import {RecyclerListView, DataProvider, LayoutProvider} from 'recyclerlistview';
 import * as RootNavigationRef from '../../RootNavigationRef';
 
 import {get_video_data} from '../functions/VideoFeedApi';
+import * as theme from '../constants/theme';
 
 // create a component
 const WIDTH = 100;
@@ -168,7 +169,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   avatar_name: {
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
     fontWeight: 'bold',
   },
 });

@@ -1,117 +1,166 @@
 //import liraries
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
-import {Chip} from 'react-native-paper';
+import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import * as theme from '../constants/theme';
 
-import * as chipHelperFun from '../functions/formChoiceChipHelpers';
-
-const maxChipItemDisplayLen = 20;
 // create a component
-class SelectChoiceChips extends Component {
-  async onCloseChip(key, item) {
-    if (this.props.onCloseChip) {
-      this.props.onCloseChip(key, item);
-    }
-  }
-
-  async onSelectChip(key, item) {
-    if (this.props.onSelectChip) {
-      this.props.onSelectChip(key, item);
-    }
-  }
-
-  renderTitle(title, instruction, icon) {
+class ChoiceItem extends Component {
+  render() {
+    const {small, item, onPress} = this.props;
+    const bgColor = item.selected ? theme.logoColor : 'white';
+    const color = item.selected ? 'white' : 'black';
     return (
       <View
         style={{
-          paddingTop: 10,
-          borderBottomWidth: 2,
+          width: small ? 75 : 110,
+          height: small ? 75 : 110,
+
+          margin: 5,
+
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: bgColor,
+
+          borderRadius: small ? 28 : 44,
+          borderWidth: 1,
+        }}>
+        <TouchableOpacity
+          style={{
+            alignItems: 'center',
+          }}
+          onPress={() => onPress && onPress(item.id)}>
+          <Image
+            source={{uri: item.thumbnail}}
+            style={{
+              height: small ? 30 : 50,
+              width: small ? 30 : 50,
+              resizeMode: 'cover',
+            }}
+          />
+          <Text
+            adjustsFontSizeToFit={true}
+            numberOfLines={2}
+            style={{
+              fontFamily: theme.fontFamily,
+              fontSize: small ? 10 : 13,
+              fontWeight: 'bold',
+              color: color,
+              marginTop: 5,
+              textAlign: 'center',
+            }}>
+            {item.tag}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+}
+
+class SelectionComp extends Component {
+  render() {
+    const {small, itemList, title, onToggleSelect} = this.props;
+    return (
+      <View style={{marginHorizontal: 10, marginTop: 10, alignItems: 'center'}}>
+        <Text style={styles.choice_title}>{title}</Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+          }}>
+          {itemList.map(item => {
+            return (
+              <ChoiceItem
+                small={small}
+                key={item.id}
+                item={item}
+                onPress={id => onToggleSelect && onToggleSelect(id)}
+              />
+            );
+          })}
+        </View>
+      </View>
+    );
+  }
+}
+
+class ChoiceComponent extends Component {
+  state = {
+    categories: {itemList: [], error: null},
+    languages: {itemList: [], error: null},
+  };
+
+  onToggleSelect = (id, category) => {
+    let itemList = this.state[category].itemList.map(item => {
+      if (item.id === id) {
+        return {...item, selected: !(item.selected ? item.selected : false)};
+      } else {
+        return item;
+      }
+    });
+    this.setState(
+      {[category]: {...this.state[category], itemList: itemList}},
+      () => {
+        this.props.onUpdateList && this.props.onUpdateList(itemList, category);
+      },
+    );
+  };
+
+  componentDidUpdate(prevProps) {
+    const {categories, languages} = this.props;
+    const {categories: prev_categories, languages: prev_languages} = prevProps;
+    if (
+      categories !== prev_categories &&
+      categories !== this.state.categories
+    ) {
+      this.setState({categories: categories});
+    }
+    if (languages !== prev_languages && languages !== this.state.languages) {
+      this.setState({languages: languages});
+    }
+  }
+
+  componentDidMount() {
+    const {categories, languages} = this.props;
+    this.setState({categories, languages});
+  }
+
+  renderMainTitle(title) {
+    return (
+      <View
+        style={{
           alignItems: 'center',
           alignSelf: 'stretch',
+          backgroundColor: 'black',
+          borderRadius: 10,
         }}>
         <Text>
-          <Text style={{fontWeight: 'bold', fontSize: 20}}> {title} </Text>
-          {icon}
-          {instruction ? (
-            <Text style={{fontSize: 10}}>{instruction}</Text>
-          ) : null}
+          <Text style={{fontWeight: 'bold', fontSize: 20, color: 'white'}}>
+            {title}
+          </Text>
         </Text>
       </View>
     );
   }
 
-  renderSelectedChips(props) {
-    const stateKey = this.props.stateKey;
-    const chipList = this.props.selected_list ? this.props.selected_list : {};
-    return (
-      <>
-        {Object.keys(chipList).map(item => {
-          return (
-            <Chip
-              key={item}
-              icon="checkbox-marked-circle-outline"
-              onPress={() =>
-                this.onCloseChip(stateKey, {[item]: chipList[item]})
-              }
-              style={styles.selected_chip_style}
-              textStyle={[styles.selected_chip_text_style]}
-              {...props}>
-              {chipHelperFun._getItemString(
-                chipList[item],
-                maxChipItemDisplayLen,
-              )}
-            </Chip>
-          );
-        })}
-      </>
-    );
-  }
-
-  renderChips(props) {
-    const stateKey = this.props.stateKey;
-    const chipList = this.props.options_list ? this.props.options_list : {};
-    return (
-      <>
-        {Object.keys(chipList).map(item => {
-          return (
-            <Chip
-              key={item}
-              icon="plus-circle-outline"
-              onPress={() =>
-                this.onSelectChip(stateKey, {[item]: chipList[item]})
-              }
-              style={styles.chip_style}
-              textStyle={[styles.chip_text_style]}
-              {...props}>
-              {chipHelperFun._getItemString(
-                chipList[item],
-                maxChipItemDisplayLen,
-              )}
-            </Chip>
-          );
-        })}
-      </>
-    );
-  }
-
   render() {
-    const {
-      stateKey,
-      title,
-      instruction,
-      icon,
-      selected_list,
-      options_list,
-      onSelectChip,
-      onCloseChip,
-    } = this.props;
+    const {categories, languages} = this.state;
+    const {title, small} = this.props;
     return (
       <View style={styles.container}>
-        {title ? this.renderTitle(title, instruction, icon) : null}
-        <View style={[styles.chip_container]}>
-          {this.renderSelectedChips()}
-          {this.renderChips()}
-        </View>
+        {this.renderMainTitle(title)}
+        <SelectionComp
+          small={small}
+          itemList={languages.itemList}
+          title={'Select Lanaguages'}
+          onToggleSelect={id => this.onToggleSelect(id, 'languages')}
+        />
+        <SelectionComp
+          small={small}
+          title={'Select Categories'}
+          itemList={categories.itemList}
+          onToggleSelect={id => this.onToggleSelect(id, 'categories')}
+        />
       </View>
     );
   }
@@ -119,37 +168,20 @@ class SelectChoiceChips extends Component {
 
 // define your styles
 const styles = StyleSheet.create({
-  container: {},
-  chip_container: {
-    paddingHorizontal: 5,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-  },
-  chip_text_style: {
-    fontSize: 15,
-    color: 'black',
-  },
-  selected_chip_text_style: {
-    fontSize: 15,
-    color: 'black',
-    fontWeight: 'bold',
-  },
-  chip_style: {
+  container: {
     backgroundColor: 'white',
-    marginHorizontal: 2,
-    marginVertical: 2,
-    borderColor: 'black',
     borderWidth: 1,
+    borderRadius: 15,
+    marginTop: 10,
+    overflow: 'hidden',
   },
-  selected_chip_style: {
-    backgroundColor: 'lightblue',
-    marginHorizontal: 2,
-    marginVertical: 2,
-    borderColor: 'black',
-    borderWidth: 1,
+  choice_title: {
+    fontFamily: theme.fontFamily,
+    fontSize: 20,
+    color: 'black',
+    margin: 5,
   },
 });
 
 //make this component available to the app
-export default SelectChoiceChips;
+export default ChoiceComponent;

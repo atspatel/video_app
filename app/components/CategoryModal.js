@@ -8,6 +8,8 @@ import ProfilePic from './ProfilePic';
 import {getUserData} from '../functions/CreatorApi';
 import {setCategory, getCategories} from '../functions/CategoryFunctions';
 
+import * as theme from '../constants/theme';
+
 // create a component
 
 class UserDrawerInfo extends Component {
@@ -28,7 +30,7 @@ class UserDrawerInfo extends Component {
         />
         <Text
           style={{
-            fontFamily: 'serif',
+            fontFamily: theme.fontFamily,
             fontSize: 18,
             color: 'black',
             marginTop: 10,
@@ -56,7 +58,7 @@ class SingleTitle extends Component {
       <TouchableOpacity onPress={() => onClick(title)} activeOpacity={0.9}>
         <View
           style={{
-            backgroundColor: isSelected ? '#FF644E' : 'white',
+            backgroundColor: isSelected ? theme.logoColor : 'white',
             borderColor: '#DDD',
             borderWidth: 1,
             borderRadius: 25,
@@ -70,7 +72,7 @@ class SingleTitle extends Component {
             style={{height: 30, width: 30, resizeMode: 'cover'}}
           />
           <View style={{padding: 10}}>
-            <Text style={[styles.titleText]}>{title.name}</Text>
+            <Text style={[styles.titleText]}>{title.tag}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -185,7 +187,7 @@ export const ConnectedCategoryModal = connect(mapStateToProps, {
 // define your styles
 const styles = StyleSheet.create({
   titleText: {
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
     fontSize: 16,
     height: 25,
     textAlign: 'center',

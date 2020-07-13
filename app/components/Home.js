@@ -6,6 +6,8 @@ import {Text} from '../components';
 // import Spinner from 'react-native-loading-spinner-overlay';
 
 import {getAnnToken, setToken} from '../functions/AuthFunctions';
+import * as theme from '../constants/theme';
+
 // import {made_choices} from '../../Actions/UserPreferenceActions';
 
 // create a component
@@ -44,12 +46,20 @@ class Home extends Component {
           style={{flex: 1, justifyContent: 'center', alignContent: 'center'}}>
           <Text
             h3
-            style={{color: 'black', textAlign: 'center', fontFamily: 'serif'}}>
+            style={{
+              color: 'black',
+              textAlign: 'center',
+              fontFamily: theme.fontFamily,
+            }}>
             Welcome to
           </Text>
           <Text
             h1
-            style={{color: 'black', textAlign: 'center', fontFamily: 'serif'}}>
+            style={{
+              color: 'black',
+              textAlign: 'center',
+              fontFamily: theme.fontFamily,
+            }}>
             KeyPoints
           </Text>
         </View>

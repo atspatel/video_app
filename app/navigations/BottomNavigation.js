@@ -9,6 +9,8 @@ import DiscoverPage from '../components/DiscoverPage';
 import ProfileNavigation from './ProfileNavigation';
 import {CreateFAB} from '../components/BottomFAB';
 
+import * as theme from '../constants/theme';
+
 const labelIconMap = {
   HomeTab: 'home',
   Search: 'search',
@@ -35,7 +37,7 @@ class TabIcon extends Component {
       <FontAwesome5
         name={icon_name}
         size={isFocused ? 35 : 25}
-        color={isFocused ? 'white' : '#999'}
+        color={isFocused ? 'black' : '#444'}
       />
     );
   }
@@ -75,9 +77,7 @@ export class MyTabBar extends Component {
           flexDirection: 'row',
           alignItems: 'flex-end',
           height: 40,
-          backgroundColor: 'black',
-          borderTopColor: 'white',
-          borderTopWidth: 1,
+          backgroundColor: theme.logoColor,
         }}>
         {navState.routes.map((route, index) => {
           const {options} = descriptors[route.key];

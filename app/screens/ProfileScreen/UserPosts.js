@@ -1,7 +1,7 @@
 //import liraries
 import React, {Component} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import VideoThumbnailFeed from '../../components/VideoThumbnailFeed';
+import VideoAvatarList from '../../components/VideoAvatarList';
 
 // create a component
 class UserPosts extends Component {
@@ -28,7 +28,7 @@ class UserPosts extends Component {
     const {qcat, qid} = this.state;
     return qid ? (
       <View style={styles.container}>
-        <VideoThumbnailFeed
+        <VideoAvatarList
           qcat={qcat}
           qid={qid}
           onScroll={onScroll}

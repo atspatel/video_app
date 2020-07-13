@@ -128,20 +128,20 @@ export async function get_otp_function(PhoneNumber) {
 }
 
 export const PostCreatorBio = form_state => dispatch => {
+  const cat_selected_list = form_state.categories.itemList
+    .filter(item => item.selected)
+    .map(item => item.tag);
+  const lang_selelced_list = form_state.languages.itemList
+    .filter(item => item.selected)
+    .map(item => item.tag);
   var formData = new FormData();
 
   formData.append('first_name', form_state.FirstName.text);
   formData.append('last_name', form_state.LastName.text);
   formData.append('username', form_state.username.text);
   formData.append('about', form_state.about);
-  formData.append(
-    'languages',
-    JSON.stringify(form_state.languages.selected_list),
-  );
-  formData.append(
-    'categories',
-    JSON.stringify(form_state.categories.selected_list),
-  );
+  formData.append('languages', JSON.stringify(lang_selelced_list));
+  formData.append('categories', JSON.stringify(cat_selected_list));
 
   if (form_state.avatar.type == 'image') {
     formData.append('image', {

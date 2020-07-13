@@ -10,17 +10,17 @@ export class ProfilePic extends Component {
     return a.length == 2 ? `${a[0][0]}${a[1][0]}` : a[0] ? a[0][0] : null;
   }
   render() {
-    const {profile_pic, user_name, size, isSingleImage} = this.props;
+    const {profile_pic, user_name, size, isSingleImage, round} = this.props;
     const img_size = size ? size : 65;
-    const radius = img_size / 2;
+    const radius = round ? img_size : 10;
     return profile_pic ? (
       isSingleImage ? (
         <SingleImage
           uri={profile_pic}
           style={{
             resizeMode: 'cover',
-            borderWidth: 1,
-            borderColor: 'black',
+            // borderWidth: 1,
+            // borderColor: 'black',
             width: img_size,
             height: img_size,
             borderRadius: radius,
@@ -31,7 +31,8 @@ export class ProfilePic extends Component {
           source={{uri: profile_pic}}
           style={[
             styles.image_stretch,
-            {width: img_size, height: img_size, borderRadius: radius},
+            {height: img_size, borderRadius: radius},
+            {width: img_size},
           ]}
         />
       )
@@ -50,12 +51,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2c3e50',
   },
   image_stretch: {
-    width: 65,
-    height: 65,
-    resizeMode: 'cover',
-    borderRadius: 33,
-    borderWidth: 1,
-    borderColor: 'black',
+    resizeMode: 'stretch',
   },
 });
 

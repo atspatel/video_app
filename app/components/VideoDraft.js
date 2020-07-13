@@ -16,6 +16,8 @@ import VideoCircularProgressBar from './VideoCircularProgressBar';
 import {PlayIcon} from '../constants/icon';
 
 import {DeleteIcon} from '../constants/icon';
+import * as theme from '../constants/theme';
+
 const {width: winWidth, height: winHeight} = Dimensions.get('window');
 
 // create a component
@@ -137,7 +139,7 @@ export class VideoPlayerModal extends Component {
                       borderRadius: 10,
                       color: 'white',
                       backgroundColor: '#d12e61',
-                      fontFamily: 'serif',
+                      fontFamily: theme.fontFamily,
                       fontSize: 18,
                     }}>
                     Create Post

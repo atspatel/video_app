@@ -14,7 +14,7 @@ import UserVideoTabBar from '../../navigations/UserVideoTabBar';
 
 import {getUserData} from '../../functions/CreatorApi';
 import {LogOutfunc} from '../../functions/AuthFunctions';
-
+import * as theme from '../../constants/theme';
 // create a component
 
 const logo_name = {
@@ -33,7 +33,6 @@ class UserInfo extends Component {
     const {
       isSelf,
       user_data,
-      send_height,
       isCollapsed,
       openCollapsible,
       GoToChoicePage,
@@ -41,38 +40,28 @@ class UserInfo extends Component {
     } = this.props;
     return (
       <View
-        style={{flexDirection: 'row'}}
-        onLayout={event => {
-          var {x, y, width, height} = event.nativeEvent.layout;
-          send_height(height);
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
         }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            flex: 1,
-            alignItems: 'center',
-          }}>
-          <ProfilePic
-            profile_pic={user_data.profile_pic}
-            user_name={user_data.name}
-            isSingleImage={true}
-          />
-          <TouchableOpacity
-            disabled={!isCollapsed}
-            onPress={openCollapsible}
-            activeOpacity={0.2}>
-            <View style={{marginHorizontal: 10, flex: 1}}>
-              <Text style={styles.user_text}>{user_data.name}</Text>
-              <Text
-                style={[styles.user_text, {fontSize: 12, fontStyle: 'italic'}]}>
-                @{user_data.username}
-              </Text>
-              <Text style={[styles.user_text, {fontSize: 12}]}>
-                {user_data.bio}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+        <ProfilePic
+          profile_pic={user_data.profile_pic}
+          user_name={user_data.name}
+          isSingleImage={true}
+        />
+        <TouchableOpacity
+          style={{flex: 1, marginHorizontal: 10}}
+          disabled={!isCollapsed}
+          onPress={openCollapsible}
+          activeOpacity={0.2}>
+          <Text style={styles.user_text}>{user_data.name}</Text>
+          <Text style={[styles.user_text, {fontSize: 12, fontStyle: 'italic'}]}>
+            @{user_data.username}
+          </Text>
+          <Text style={[styles.user_text, {fontSize: 12}]} numberOfLines={2}>
+            {user_data.bio} {user_data.bio} {user_data.bio}
+          </Text>
+        </TouchableOpacity>
         {isCollapsed ? (
           <View style={{flexDirection: 'row', marginRight: 10}}>
             <MaterialCommunityIcons
@@ -130,8 +119,6 @@ class FollowInfo extends Component {
         style={{
           flexDirection: 'row',
           justifyContent: 'space-around',
-          // width: '70%',
-          // alignSelf: 'flex-end',
         }}>
         <Text style={styles.follow_text}>
           <Text style={{fontSize: 18}}>{user_data.followers}</Text>
@@ -255,7 +242,7 @@ class ContentInfo extends Component {
             {user_data.languages_data.slice(0, 3).map(item => {
               return (
                 <Chip key={item.id} style={styles.chip}>
-                  <Text style={{fontFamily: 'serif'}}>{item.tag}</Text>
+                  <Text style={{fontFamily: theme.fontFamily}}>{item.tag}</Text>
                 </Chip>
               );
             })}
@@ -282,7 +269,7 @@ class ContentInfo extends Component {
             {user_data.categories_data.slice(0, 4).map(item => {
               return (
                 <Chip key={item.id} style={styles.chip}>
-                  <Text style={{fontFamily: 'serif'}}>{item.tag}</Text>
+                  <Text style={{fontFamily: theme.fontFamily}}>{item.tag}</Text>
                 </Chip>
               );
             })}
@@ -297,16 +284,6 @@ class ProfileInfo extends Component {
   constructor(props) {
     super(props);
   }
-  getMinHeight = height => {
-    // if (this.props.setHMin) {
-    //   this.props.setHMin(height);
-    // }
-  };
-  getMaxHeight = height => {
-    // if (this.props.setHMax) {
-    //   this.props.setHMax(height);
-    // }
-  };
   render() {
     const {
       isSelf,
@@ -322,25 +299,20 @@ class ProfileInfo extends Component {
           borderBottomColor: 'black',
           borderBottomWidth: 1,
           paddingHorizontal: 10,
-        }}
-        onLayout={event => {
-          var {x, y, width, height} = event.nativeEvent.layout;
-          this.getMaxHeight(height);
         }}>
         <UserInfo
           isSelf={isSelf}
           user_data={user_data}
-          send_height={this.getMinHeight}
           isCollapsed={isCollapsed}
           openCollapsible={openCollapsible}
           GoToSettingPage={GoToSettingPage}
           GoToChoicePage={GoToChoicePage}
         />
-        <Collapsible collapsed={isCollapsed}>
-          <SMInfo user_data={user_data} />
-          <ContentInfo user_data={user_data} />
-          <FollowInfo user_data={user_data} />
-        </Collapsible>
+        {/* <Collapsible collapsed={isCollapsed}> */}
+        <SMInfo user_data={user_data} />
+        <ContentInfo user_data={user_data} />
+        <FollowInfo user_data={user_data} />
+        {/* </Collapsible> */}
       </View>
     );
   }
@@ -457,11 +429,11 @@ const styles = StyleSheet.create({
   user_text: {
     color: 'black',
     fontSize: 20,
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
   },
 
   follow_text: {
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
     fontSize: 14,
   },
   chip: {

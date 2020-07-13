@@ -14,11 +14,12 @@ import ProfilePicUpload from '../../components/ProfilePicUpload';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import debounce from 'lodash.debounce';
 
-import SelectLangCat from '../../components/SelectLangCat';
+import ChoiceComponent from '../../components/ChoiceComponent';
 import {Text} from '../../components';
 import {LogOutfunc, PostCreatorBio} from '../../functions/AuthFunctions';
 import {get_options} from '../../functions/CategoryFunctions';
 import {check_username} from '../../functions/CreatorApi';
+import * as theme from '../../constants/theme';
 // create a component
 class NameInput extends Component {
   render() {
@@ -82,13 +83,11 @@ class SettingScreen extends Component {
       },
 
       languages: {
-        options_list: [],
-        selected_list: [],
+        itemList: [],
         error: false,
       },
       categories: {
-        options_list: [],
-        selected_list: [],
+        itemList: [],
         error: false,
       },
     };
@@ -110,23 +109,38 @@ class SettingScreen extends Component {
   };
 
   onPressDeleteProfilePic = () => {
-    this.setState({
-      avatar: {...this.state.avatar, type: 'image'},
-    });
+    console.warn('here....');
+    this.setState(
+      {
+        avatar: {...this.state.avatar, type: 'label'},
+      },
+      () => this.set_avatar_label(),
+    );
   };
+
+  set_avatar_label() {
+    if (this.state.avatar.type != 'image') {
+      var label_string = '';
+      if (this.state.FirstName.text) {
+        label_string = this.state.FirstName.text.substring(0, 1);
+      }
+      if (this.state.LastName.text) {
+        label_string = label_string + this.state.LastName.text.substring(0, 1);
+      }
+      this.setState({
+        avatar: {...this.state.avatar, label: label_string, type: 'label'},
+      });
+    }
+  }
 
   onChangeText = (key, text) => {
-    this.setState({[key]: {text: text, error: null}});
+    this.setState({[key]: {text: text, error: null}}, () =>
+      this.set_avatar_label(),
+    );
   };
 
-  updateList = (key, selected_list, options_list) => {
-    this.setState({
-      [key]: {
-        ...this.state[key],
-        selected_list: selected_list,
-        options_list: options_list,
-      },
-    });
+  onUpdateList = (itemList, category) => {
+    this.setState({[category]: {...this.state[category], itemList: itemList}});
   };
 
   onChangeUserName = text => {
@@ -156,6 +170,8 @@ class SettingScreen extends Component {
   validate_form = () => {
     let isValid = true;
     const {username, FirstName, categories, languages} = this.state;
+    const cat_selected_list = categories.itemList.filter(item => item.selected);
+    const lang_selelced_list = languages.itemList.filter(item => item.selected);
     if (
       username.text === null ||
       username.text.length === 0 ||
@@ -168,11 +184,11 @@ class SettingScreen extends Component {
       this.setState({FirstName: {...FirstName, error: true}});
       isValid = false;
     }
-    if (Object.keys(categories.selected_list).length === 0) {
+    if (cat_selected_list.length === 0) {
       this.setState({categories: {...categories, error: true}});
       isValid = false;
     }
-    if (Object.keys(languages.selected_list).length === 0) {
+    if (lang_selelced_list.length === 0) {
       this.setState({languages: {...languages, error: true}});
       isValid = false;
     }
@@ -200,7 +216,7 @@ class SettingScreen extends Component {
             {
               text: 'Ok',
               onPress: () => {
-                null;
+                this.props.navigation.goBack();
               },
             },
           ],
@@ -239,28 +255,30 @@ class SettingScreen extends Component {
     return new_obj;
   }
   update_options = (languages_data, categories_data) => {
-    const languages_selected = this.array_to_object(languages_data);
-    const categories_selected = this.array_to_object(categories_data);
+    const lang_keys = languages_data.map(item => item.id);
+    const cat_keys = categories_data.map(item => item.id);
     get_options().then(response => {
-      let languages_options = this.array_to_object(response.languages_options);
-      let categories_options = this.array_to_object(
-        response.categories_options,
-      );
-      Object.entries(languages_selected).map(([key, value]) => {
-        delete languages_options[key];
+      let language_itemList = response.languages_options.map(item => {
+        if (lang_keys.indexOf(item.id) !== -1) {
+          return {...item, selected: true};
+        } else {
+          return {...item, selected: false};
+        }
       });
-      Object.entries(categories_selected).map(([key, value]) => {
-        delete categories_options[key];
+      let category_itemList = response.categories_options.map(item => {
+        if (cat_keys.indexOf(item.id) !== -1) {
+          return {...item, selected: true};
+        } else {
+          return {...item, selected: false};
+        }
       });
       this.setState({
         languages: {
-          options_list: languages_options,
-          selected_list: languages_selected,
+          itemList: language_itemList,
           error: false,
         },
         categories: {
-          options_list: categories_options,
-          selected_list: categories_selected,
+          itemList: category_itemList,
           error: false,
         },
       });
@@ -281,10 +299,10 @@ class SettingScreen extends Component {
         username: {text: user_data.username, error: null},
         about: user_data.bio,
         avatar: {
-          type: 'image',
+          type: 'label',
           label: '',
           image_uri: {
-            uri: user_data.profile_pic ? user_data.profile_pic : dummy_url,
+            uri: user_data.profile_pic ? user_data.profile_pic : null,
             type: 'image/jpg',
             fileName: 'temp_image.jpg',
           },
@@ -296,6 +314,7 @@ class SettingScreen extends Component {
           user_data.categories_data,
         );
         this.checkUsername();
+        this.set_avatar_label();
       },
     );
   }
@@ -304,14 +323,6 @@ class SettingScreen extends Component {
     const {FirstName, LastName} = this.state;
     return (
       <View style={[styles.container]}>
-        <View style={{height: 30}}>
-          <Text
-            hlink
-            style={{alignSelf: 'flex-end', marginTop: 20, color: '#888'}}
-            onPress={this.onClickLogOut}>
-            Log Out
-          </Text>
-        </View>
         <ScrollView
           style={{flex: 1, minHeight: Dimensions.get('window').height - 300}}>
           <ProfilePicUpload
@@ -367,35 +378,24 @@ class SettingScreen extends Component {
               marginHorizontal: 5,
             }}
           />
-          <SelectLangCat
+          <ChoiceComponent
             title={'Your Expertise'}
-            show_instruction={true}
+            small={true}
             languages={this.state.languages}
             categories={this.state.categories}
-            updateList={this.updateList}
-            // show_icon={true}
+            onUpdateList={this.onUpdateList}
           />
         </ScrollView>
-
-        <View
-          style={{
-            backgroundColor: 'black',
-            margin: 5,
-            marginHorizontal: 75,
-            padding: 5,
-            borderRadius: 5,
-          }}>
-          <TouchableOpacity onPress={() => this.onClickSave()}>
-            <Text
-              style={{
-                fontFamily: 'serif',
-                textAlign: 'center',
-                color: 'white',
-                fontSize: 18,
-              }}>
-              Save
-            </Text>
-          </TouchableOpacity>
+        <TouchableOpacity onPress={() => this.onClickSave()}>
+          <Text style={styles.button_style}>Save</Text>
+        </TouchableOpacity>
+        <View style={{height: 30, width: '100%', position: 'absolute'}}>
+          <Text
+            hlink
+            style={{alignSelf: 'flex-end', marginTop: 20, color: '#888'}}
+            onPress={this.onClickLogOut}>
+            Log Out
+          </Text>
         </View>
       </View>
     );
@@ -408,6 +408,17 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 15,
     backgroundColor: 'white',
+  },
+  button_style: {
+    fontFamily: theme.fontFamily,
+    textAlign: 'center',
+    color: 'white',
+    fontSize: 18,
+    backgroundColor: 'black',
+    margin: 5,
+    marginHorizontal: 75,
+    padding: 5,
+    borderRadius: 5,
   },
 });
 

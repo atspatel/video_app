@@ -11,6 +11,7 @@ import {connect} from 'react-redux';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import TopicAvatarList from './TopicAvatarList';
+import * as theme from '../constants/theme';
 
 class SingleTopicView extends Component {
   render() {
@@ -44,12 +45,12 @@ class SingleTopicView extends Component {
             <Text
               style={{
                 fontSize: 16,
-                fontFamily: 'serif',
+                fontFamily: theme.fontFamily,
                 fontWeight: 'bold',
               }}>
               {topic.name}
             </Text>
-            <Text style={{fontSize: 14, fontFamily: 'serif'}}>
+            <Text style={{fontSize: 14, fontFamily: theme.fontFamily}}>
               Videos: {topic.videos} | Views: {topic.views}
             </Text>
           </View>
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   fabButton: {
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
     backgroundColor: 'black',
     borderWidth: 1,
     borderColor: 'white',

@@ -17,6 +17,7 @@ import {DeleteIcon} from '../constants/icon';
 import ProfilePic from './ProfilePic';
 import * as RootNavigation from '../../RootNavigationRef';
 import {get_video_data, delete_video} from '../functions/VideoFeedApi';
+import * as theme from '../constants/theme';
 
 const HEIGHT = 160;
 // create a component
@@ -46,7 +47,12 @@ class UserInfo extends Component {
             flexDirection: 'row',
             alignItems: 'center',
           }}>
-          <Text style={{color: 'white', fontFamily: 'serif', marginRight: 5}}>
+          <Text
+            style={{
+              color: 'white',
+              fontFamily: theme.fontFamily,
+              marginRight: 5,
+            }}>
             {user_info.name}
           </Text>
           <ProfilePic
@@ -286,7 +292,7 @@ const styles = StyleSheet.create({
   },
   title_text: {
     color: 'black',
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
     fontSize: 15,
     lineHeight: 20,
     maxHeight: 105,

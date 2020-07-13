@@ -8,6 +8,7 @@ import {setCategory} from '../../functions/CategoryFunctions';
 import {showLogInAlert} from '../../functions/AuthFunctions';
 import VideoFeed from '../../components/VideoFeed';
 import {ConnectedCategoryModal} from '../../components/CategoryModal';
+import * as theme from '../../constants/theme';
 
 class FeedScreen extends Component {
   constructor(props) {
@@ -202,7 +203,7 @@ const styles = StyleSheet.create({
   },
   title_text: {
     marginTop: 5,
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
     fontSize: 18,
     lineHeight: 20,
     maxHeight: 65,

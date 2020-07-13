@@ -22,6 +22,8 @@ import RNThumbnail from 'react-native-thumbnail';
 import RNGRP from 'react-native-real-path';
 import moment from 'moment';
 
+import * as theme from '../constants/theme';
+
 const {Type, FlashMode} = RNCamera.Constants;
 const {VideoQuality} = RNCamera.Constants;
 const {width: winWidth, height: winHeight} = Dimensions.get('window');
@@ -184,7 +186,6 @@ class VideoRecorder extends Component {
   };
 
   onClickEditDraft = () => {
-    console.warn(this.props.video_list.length, '----');
     if (this.props.video_list.length === 1) {
       this.props.navigation.navigate('VideoEditor', {
         video_info: this.props.video_list[0],
@@ -285,7 +286,7 @@ class VideoRecorder extends Component {
                     fontSize: 20,
                     alignSelf: 'center',
                     color: 'white',
-                    backgroundColor: 'lightblue',
+                    backgroundColor: theme.logoColor,
                     padding: 5,
                     borderRadius: 5,
                   }}>

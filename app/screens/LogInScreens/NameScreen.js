@@ -6,6 +6,7 @@ import {Text} from 'react-native-paper';
 import ProfilePicUpload from '../../components/ProfilePicUpload';
 
 import {PostUserBio} from '../../functions/AuthFunctions';
+import * as theme from '../../constants/theme';
 
 const dummy_url =
   'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSDgTNKTeE985pM29w_MVlLv6Q6zXuK8qHKq4O0pcB_aWH4JbQV';
@@ -53,11 +54,14 @@ class NameScreen extends Component {
     });
   }
 
-  onPressDeleteProfilePic() {
-    this.setState({
-      avatar: {...this.state.avatar, type: 'label'},
-    });
-  }
+  onPressDeleteProfilePic = () => {
+    this.setState(
+      {
+        avatar: {...this.state.avatar, type: 'label'},
+      },
+      () => this.set_avatar_label(),
+    );
+  };
 
   set_avatar_label() {
     if (this.state.avatar.type != 'image') {
@@ -105,57 +109,64 @@ class NameScreen extends Component {
     }
   }
 
-  _render_button_section() {
-    return (
-      <View style={styles.button_container}>
-        <TouchableOpacity
-          onPress={this.submit_screen1_form}
-          style={styles.buttonBg}>
-          <Text style={styles.buttonText}>Next</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
   render() {
     return (
-      <View style={[styles.container]}>
+      <View style={styles.container}>
         <Spinner visible={this.state.isLoading} />
         <View style={styles.formContainer}>
-          <ProfilePicUpload
-            avatar={this.state.avatar}
-            onChangeProfilePic={this.onChangeProfilePic.bind(this)}
-            onPressDeleteProfilePic={this.onPressDeleteProfilePic.bind(this)}
-          />
-          <View style={{flexDirection: 'row'}}>
-            <TextInput
-              placeholder={'First Name*'}
-              placeholderTextColor={this.state.FirstName.error ? 'red' : '#DDD'}
-              value={this.state.FirstName.text}
-              onChangeText={text => this._onChangeText('FirstName', text)}
-              style={{
-                textAlign: 'center',
-                fontWeight: 'bold',
-                flex: 1,
-                borderBottomWidth: 1,
-                marginHorizontal: 5,
-              }}
-            />
-            <TextInput
-              placeholder={'Last Name'}
-              placeholderTextColor={'#DDD'}
-              value={this.state.LastName.text}
-              onChangeText={text => this._onChangeText('LastName', text)}
-              style={{
-                textAlign: 'center',
-                fontWeight: 'bold',
-                flex: 1,
-                borderBottomWidth: 1,
-                marginHorizontal: 5,
-              }}
-            />
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'flex-end',
+              backgroundColor: theme.logoColor,
+              borderBottomLeftRadius: 150,
+            }}>
+            <View style={{paddingBottom: 20}}>
+              <ProfilePicUpload
+                avatar={this.state.avatar}
+                onChangeProfilePic={this.onChangeProfilePic.bind(this)}
+                onPressDeleteProfilePic={this.onPressDeleteProfilePic}
+              />
+            </View>
+          </View>
+          <View style={{flex: 1}}>
+            <View style={{flexDirection: 'row', paddingTop: 20}}>
+              <TextInput
+                placeholder={'First Name*'}
+                placeholderTextColor={
+                  this.state.FirstName.error ? 'red' : '#DDD'
+                }
+                value={this.state.FirstName.text}
+                onChangeText={text => this._onChangeText('FirstName', text)}
+                style={{
+                  textAlign: 'center',
+                  fontWeight: 'bold',
+                  flex: 1,
+                  fontSize: 20,
+                  borderBottomWidth: 1,
+                  marginHorizontal: 5,
+                }}
+              />
+              <TextInput
+                placeholder={'Last Name'}
+                placeholderTextColor={'#DDD'}
+                value={this.state.LastName.text}
+                onChangeText={text => this._onChangeText('LastName', text)}
+                style={{
+                  textAlign: 'center',
+                  fontWeight: 'bold',
+                  flex: 1,
+                  fontSize: 20,
+                  borderBottomWidth: 1,
+                  marginHorizontal: 5,
+                }}
+              />
+            </View>
+            <TouchableOpacity onPress={this.submit_screen1_form}>
+              <Text style={styles.button_style}>Next</Text>
+            </TouchableOpacity>
           </View>
         </View>
-        {this._render_button_section()}
       </View>
     );
   }
@@ -165,14 +176,10 @@ class NameScreen extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    // alignItems: 'center',
     backgroundColor: 'white',
   },
   formContainer: {
-    backgroundColor: 'white',
-    paddingVertical: 10,
-    borderRadius: 10,
+    flex: 1,
   },
   button_container: {
     flexDirection: 'row',
@@ -195,8 +202,20 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   buttonText: {
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
     fontSize: 20,
+  },
+  button_style: {
+    fontFamily: theme.fontFamily,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: 'black',
+    fontSize: 18,
+    backgroundColor: theme.logoColor,
+    marginTop: 20,
+    marginHorizontal: 25,
+    padding: 5,
+    borderRadius: 10,
   },
 });
 

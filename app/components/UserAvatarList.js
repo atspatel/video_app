@@ -7,7 +7,8 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import FollowButton from './FollowButtonTwo';
 import ProfilePic from './ProfilePic';
 import {get_creator_data, post_follow} from '../functions/CreatorApi';
-const HEIGHT = 160;
+import * as theme from '../constants/theme';
+const HEIGHT = 200;
 const WIDTH = 130;
 // create a component
 
@@ -27,22 +28,33 @@ export class SourceCard extends Component {
         style={{
           height: HEIGHT - 10,
           width: WIDTH - 10,
-          backgroundColor: '#DDD',
+          backgroundColor: 'white',
           borderRadius: 10,
           padding: 5,
           alignItems: 'center',
+          justifyContent: 'center',
+          marginTop: 5,
+          // borderWidth: 0.5,
+
+          shadowColor: '#000',
+          shadowOffset: {
+            width: 0,
+            height: 3,
+          },
+          shadowOpacity: 0.27,
+          shadowRadius: 4.65,
+
+          elevation: 6,
         }}>
         <ProfilePic
           profile_pic={source_info.profile_pic}
           user_name={source_info.name}
-          size={70}
+          size={110}
         />
         <Text style={styles.avatar_name} numberOfLines={1}>
           {source_info.name ? source_info.name.substring(0, 12) : null}
         </Text>
-        <Text style={styles.follow_count}>
-          {source_info.followers} followers
-        </Text>
+        <Text style={{fontSize: 12}}>{source_info.followers} followers</Text>
         {showFollow ? (
           <FollowButton
             qid={source_info.id}
@@ -132,27 +144,6 @@ class UserAvatarList extends Component {
     const {data_list} = this.state;
     return data_list.length > 0 ? (
       <View>
-        <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity
-            onPress={this.toggleUserSection}
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingHorizontal: 10,
-              marginHorizontal: 2,
-              borderRadius: 10,
-            }}>
-            <Text style={styles.userLabel}>{label}</Text>
-            <MaterialCommunityIcons
-              style={{width: 50, alignItems: 'center'}}
-              name={'arrow-right-circle'}
-              size={30}
-              color="black"
-            />
-          </TouchableOpacity>
-        </View>
         <View
           style={{
             height: HEIGHT + 10,
@@ -161,7 +152,6 @@ class UserAvatarList extends Component {
             ref={c => {
               this._refRecyclerListView = c;
             }}
-            style={{margin: 10}}
             layoutProvider={this._layoutProvider}
             dataProvider={dataProvider.cloneWithRows(data_list)}
             rowRenderer={(type, data) => this.render_avatar('option', data)}
@@ -183,12 +173,13 @@ const styles = StyleSheet.create({
     borderRadius: 40,
   },
   avatar_name: {
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
     fontWeight: 'bold',
+    color: 'black',
   },
   userLabel: {
     fontSize: 18,
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
     padding: 5,
   },
 });

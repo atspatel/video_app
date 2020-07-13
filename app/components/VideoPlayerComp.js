@@ -8,10 +8,12 @@ import {
   Dimensions,
   TouchableOpacity,
   BackHandler,
+  Animated,
 } from 'react-native';
 import {connect} from 'react-redux';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 import FollowButton from './FollowButtonTwo';
 import ProfilePic from './ProfilePic';
 import UserVideoBottomFeed from './UserVideoBottomFeed';
@@ -20,6 +22,7 @@ import * as RootNavigationRef from '../../RootNavigationRef';
 import {LikeIcon} from '../constants/icon';
 import ShareButton from './ShareButton';
 import VideoCircularProgressBar from './VideoCircularProgressBar';
+import * as theme from '../constants/theme';
 
 const {width: winWidth, height: winHeight} = Dimensions.get('window');
 
@@ -106,14 +109,6 @@ class VideoPlayerSideBar extends Component {
           total={total}
           style={{marginTop: 5}}
         />
-        {/* <AnimatedCircularProgress
-          size={40}
-          width={3}
-          fill={current ? (1 - current / total) * 100 : 100}
-          tintColor="#FF644E"
-          backgroundColor="#999"
-          style={{marginTop: 5}}
-        /> */}
       </View>
     );
   }
@@ -163,7 +158,8 @@ class VideoPlayerBottomBar extends Component {
                   flex: 1,
                   color: 'black',
                   fontSize: 16,
-                  fontFamily: 'serif',
+                  fontFamily: theme.fontFamily,
+                  fontWeight: 'bold',
                   marginLeft: 5,
                 }}
                 numberOfLines={1}>
@@ -199,14 +195,23 @@ class VideoPlayerComp extends Component {
       duration: 0,
       current: 0,
       isBuffering: false,
-
-      displayUrl: null,
       showButton: false,
       isBottomBarOpen: false,
-    };
 
-    this.toggle_pause = this.toggle_pause.bind();
+      animationVal: new Animated.Value(0),
+    };
   }
+
+  _resetAnimation = () => {
+    this.state.animationVal.setValue(0);
+  };
+  _startAnimation = () => {
+    Animated.timing(this.state.animationVal, {
+      toValue: 220,
+      duration: 3000,
+      // useNativeDriver: true,
+    }).start();
+  };
 
   toggleBottomMenu = () => {
     this.setState({isBottomBarOpen: !this.state.isBottomBarOpen});
@@ -223,7 +228,11 @@ class VideoPlayerComp extends Component {
     }
   };
   toggle_pause = () => {
-    this.setState({paused: !this.state.paused});
+    if (this.state.isBottomBarOpen) {
+      this.setState({isBottomBarOpen: false});
+    } else {
+      this.setState({paused: !this.state.paused});
+    }
   };
 
   handleOnLoad = meta => {
@@ -239,12 +248,13 @@ class VideoPlayerComp extends Component {
   };
 
   componentDidUpdate(prevProps) {
-    const {duration, current, showButton, displayUrl} = this.state;
-    if (duration && duration - current < 15 && !showButton && displayUrl) {
-      this.setState({showButton: true});
+    const {duration, current, showButton} = this.state;
+    const {external_urls: displayUrl} = this.props.video_info;
+    if (duration && duration - current < 20 && !showButton && displayUrl) {
+      this.setState({showButton: true}, () => this._startAnimation());
     }
-    if (duration && duration - current > 15 && showButton) {
-      this.setState({showButton: false});
+    if (duration && duration - current > 20 && showButton) {
+      this.setState({showButton: false}, () => this._resetAnimation());
     }
     if (prevProps.paused !== this.props.paused) {
       this.setState({paused: this.props.paused}, () => {
@@ -265,16 +275,10 @@ class VideoPlayerComp extends Component {
   };
 
   componentDidMount() {
-    const displayUrl = this.props.video_info.external_urls;
     this.setState({
       paused: this.props.paused,
       volume: this.props.volume,
-      displayUrl: displayUrl,
     });
-    // this.backHandler = BackHandler.addEventListener(
-    //   'hardwareBackPress',
-    //   this.handleBackButtonClick,
-    // );
   }
   componentWillUnmount() {
     // this.backHandler && this.backHandler.remove();
@@ -311,7 +315,7 @@ class VideoPlayerComp extends Component {
   }
   render() {
     const {video_info, height, onClickLike} = this.props;
-    const {paused, volume, showButton, displayUrl} = this.state;
+    const {paused, volume, showButton} = this.state;
     return (
       <View style={[styles.container, {height: height}]}>
         <TouchableOpacity onPress={this.toggle_pause} activeOpacity={0.9}>
@@ -322,22 +326,60 @@ class VideoPlayerComp extends Component {
             </View>
           ) : null}
           {showButton ? (
-            <View style={styles.overlay_button}>
+            <Animated.View
+              style={[
+                styles.overlay_button,
+                {
+                  position: 'absolute',
+                  bottom: 100,
+                  left: 0,
+                  width: this.state.animationVal,
+                  overflow: 'hidden',
+                },
+              ]}>
               <TouchableOpacity
                 style={{
-                  backgroundColor: '#DDD',
-                  padding: 5,
-                  paddingHorizontal: 20,
-                  borderRadius: 10,
+                  backgroundColor: theme.logoColor,
+                  paddingHorizontal: 0,
+                  borderRadius: 20,
+                  borderTopLeftRadius: 0,
+                  borderBottomLeftRadius: 0,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'flex-end',
                 }}
                 onPress={() => {
-                  this.openURL(displayUrl);
+                  this.openURL(video_info.external_urls);
                 }}>
-                <Text style={{fontSize: 20, fontFamily: 'serif'}}>
-                  Watch More Here
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    fontSize: 20,
+                    fontFamily: theme.fontFamily,
+                    fontWeight: 'bold',
+                    marginRight: 5,
+                    color: 'white',
+                  }}>
+                  See more of this
                 </Text>
+                <View
+                  style={{
+                    width: 35,
+                    height: 35,
+                    borderRadius: 20,
+                    // borderWidth: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: 'white',
+                  }}>
+                  <MaterialCommunityIcons
+                    name={'information-variant'}
+                    size={30}
+                    color={'black'}
+                  />
+                </View>
               </TouchableOpacity>
-            </View>
+            </Animated.View>
           ) : null}
         </TouchableOpacity>
         <ConnectedVideoPlayerSideBar
@@ -361,7 +403,7 @@ class VideoPlayerComp extends Component {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    backgroundColor: 'black',
+    backgroundColor: 'white',
   },
   overlay_play: {
     position: 'absolute',
@@ -376,21 +418,16 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   overlay_button: {
-    position: 'absolute',
-    height: 50,
-    width: '100%',
-
-    bottom: 60,
-    left: 0,
-
-    justifyContent: 'center',
-    alignItems: 'center',
-    opacity: 0.8,
+    // height: 50,
+    // width: '100%',
+    // justifyContent: 'center',
+    // alignItems: 'center',
+    // opacity: 1.0,
   },
   overlay_bar: {
     width: '100%',
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
     paddingHorizontal: 10,
     overflow: 'hidden',
     position: 'absolute',
@@ -398,6 +435,8 @@ const styles = StyleSheet.create({
     right: 0,
     opacity: 1.0,
     backgroundColor: 'rgba(255, 255, 255, 1.0)',
+    // borderWidth: 0.5,
+    // borderBottomWidth: 0,
   },
   sidebar: {
     width: 60,
@@ -411,11 +450,11 @@ const styles = StyleSheet.create({
     bottom: 70,
     right: 20,
     opacity: 1.0,
-    backgroundColor: 'rgba(0, 0,  0, 0.2)',
+    backgroundColor: 'rgba(0, 0,  0, 0.0)',
   },
   title_text: {
-    fontFamily: 'serif',
-    fontSize: 14,
+    fontFamily: theme.fontFamily,
+    fontSize: 16,
     color: 'black',
   },
 });

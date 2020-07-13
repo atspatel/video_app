@@ -3,9 +3,9 @@ import React, {Component} from 'react';
 import {StyleSheet} from 'react-native';
 import {FAB} from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {ShareIcon} from '../constants/icon';
 
 import * as RootNavigation from '../../RootNavigationRef';
+import * as theme from '../constants/theme';
 
 // create a component
 export class CreateFAB extends Component {
@@ -24,7 +24,7 @@ export class CreateFAB extends Component {
             <MaterialCommunityIcons
               name="plus"
               size={40}
-              color={'white'}
+              color={'black'}
               style={{
                 margin: -10,
                 alignSelf: 'center',
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2c3e50',
   },
   fabButton: {
-    backgroundColor: 'black',
+    backgroundColor: theme.logoColor,
     // width: 130,
     height: 40,
     borderWidth: 2,

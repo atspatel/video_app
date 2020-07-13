@@ -1,6 +1,7 @@
 //import liraries
 import React, {Component} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import * as theme from '../constants/theme';
 
 class FollowButton extends Component {
   state = {
@@ -55,7 +56,7 @@ const styles = StyleSheet.create({
   },
   follow_button_text: {
     color: 'white',
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
   },
 });
 

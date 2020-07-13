@@ -3,6 +3,7 @@ import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as RootNavigation from '../../RootNavigationRef';
+import * as theme from '../constants/theme';
 // import {get_follow_data} from '../Actions/ProfileActions';
 
 // create a component
@@ -96,13 +97,12 @@ class HashTag extends Component {
 // define your styles
 const styles = StyleSheet.create({
   hashtag_text: {
-    // fontFamily: 'serif',
     fontSize: 13,
     fontWeight: 'bold',
     color: 'lightblue',
   },
   header_title_text: {
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
     fontSize: 18,
     fontStyle: 'italic',
   },

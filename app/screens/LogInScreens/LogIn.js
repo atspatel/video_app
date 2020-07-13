@@ -5,9 +5,10 @@ import CodeInput from 'react-native-confirmation-code-input';
 
 import {Text, TextInputField} from '../../components';
 
+import KeypointsLogo from '../../constants/KeypointsLogo';
 import {connect} from 'react-redux';
 import LogInfunc, {get_otp_function} from '../../functions/AuthFunctions';
-
+import * as theme from '../../constants/theme';
 // create a component
 
 const SEND_OTP = 'Send OTP';
@@ -195,74 +196,79 @@ class LogIn extends Component {
     return (
       <View style={styles.container}>
         {/* <Spinner visible={this.state.isLoading} /> */}
-        <View style={{height: 50}}>
-          <Text
-            hlink
-            style={{alignSelf: 'flex-end', marginTop: 20, color: '#888'}}
-            onPress={() => this.props.navigation.navigate('HomeTab')}>
-            Skip
-          </Text>
-        </View>
         <View
-          style={[{flex: 1, alignContent: 'center', justifyContent: 'center'}]}>
-          <Text
-            h1
+          style={{
+            flex: 1,
+            backgroundColor: theme.logoColor,
+            borderBottomRightRadius: 150,
+            justifyContent: 'flex-end',
+          }}>
+          <View style={{position: 'absolute', top: 0, right: 0}}>
+            <Text
+              hlink
+              style={{
+                alignSelf: 'flex-end',
+                margin: 20,
+                color: 'black',
+              }}
+              onPress={() => this.props.navigation.navigate('HomeTab')}>
+              Skip
+            </Text>
+          </View>
+          <View
             style={{
-              fontSize: 15,
-              color: 'black',
-              alignSelf: 'center',
-              fontFamily: 'serif',
+              marginBottom: 40,
+              alignContent: 'center',
+              justifyContent: 'center',
+              alignItems: 'center',
             }}>
-            Welcome to
-          </Text>
-          <Text
-            h1
-            style={{
-              fontSize: 25,
-              color: 'black',
-              alignSelf: 'center',
-              fontFamily: 'serif',
-            }}>
-            KeyPoints
-          </Text>
-          <TextInputField
-            mode={'flat'}
-            style={{
-              backgroundColor: 'white',
-              fontSize: 20,
-            }}
-            maxLength={10}
-            label="Phone Number"
-            autoCompleteType={'tel'}
+            <Text
+              h1
+              style={{
+                fontSize: 20,
+                color: 'black',
+                alignSelf: 'center',
+                fontFamily: theme.fontFamily,
+              }}>
+              Welcome to
+            </Text>
+            {/* <Text
+              h1
+              style={{
+                fontSize: 30,
+                color: 'black',
+                alignSelf: 'center',
+                fontFamily: theme.fontFamily,
+              }}>
+              KeyPoints
+            </Text> */}
+            <KeypointsLogo />
+          </View>
+        </View>
+        <View style={{flex: 1, paddingHorizontal: 20}}>
+          <TextInput
+            placeholder={'Phone Number'}
+            placeholderTextColor={'#999'}
             value={this.state.phone_number.text}
             onChangeText={text => this.onChangeText(text)}
             error={this.state.phone_number.error}
             dataDetectorTypes={'phoneNumber'}
             keyboardType={'numeric'}
+            style={{
+              fontSize: 20,
+              borderWidth: 1,
+              borderRadius: 5,
+              padding: 15,
+              marginTop: 40,
+            }}
           />
           {this.render_otp()}
           <TouchableOpacity onPress={() => this.onClickButton()}>
-            <View
-              style={{
-                backgroundColor: 'black',
-                marginTop: 5,
-                marginHorizontal: 25,
-                padding: 5,
-                borderRadius: 5,
-              }}>
-              <Text
-                style={{
-                  fontFamily: 'serif',
-                  textAlign: 'center',
-                  color: 'white',
-                  fontSize: 18,
-                }}>
-                {this.state.otp_sent ? LOG_IN : SEND_OTP}
-              </Text>
-            </View>
+            <Text style={styles.button_style}>
+              {this.state.otp_sent ? LOG_IN : SEND_OTP}
+            </Text>
           </TouchableOpacity>
         </View>
-        <View style={{height: 50}}></View>
         <Snackbar
           style={{alignSelf: 'center'}}
           visible={this.state.snackbar.visible}
@@ -283,9 +289,7 @@ class LogIn extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'stretch',
-    backgroundColor: '#DDD',
-    paddingHorizontal: 15,
+    backgroundColor: 'white',
   },
   underlineStyleBase: {
     width: 30,
@@ -296,6 +300,18 @@ const styles = StyleSheet.create({
   },
   underlineStyleHighLighted: {
     borderColor: 'black',
+  },
+  button_style: {
+    fontFamily: theme.fontFamily,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: 'white',
+    fontSize: 18,
+    backgroundColor: theme.logoColor,
+    marginTop: 20,
+    marginHorizontal: 25,
+    padding: 5,
+    borderRadius: 10,
   },
 });
 

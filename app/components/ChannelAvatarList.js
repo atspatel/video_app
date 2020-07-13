@@ -5,6 +5,7 @@ import {RecyclerListView, DataProvider, LayoutProvider} from 'recyclerlistview';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import FollowButton from './FollowButton';
+import * as theme from '../constants/theme';
 const HEIGHT = 160;
 const WIDTH = 130;
 // create a component
@@ -159,12 +160,12 @@ const styles = StyleSheet.create({
     borderRadius: 40,
   },
   avatar_name: {
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
     fontWeight: 'bold',
   },
   userLabel: {
     fontSize: 18,
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
     padding: 5,
   },
 });

@@ -2,7 +2,7 @@
 import React, {Component} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {get_follow, post_follow} from '../functions/CreatorApi';
-
+import * as theme from '../constants/theme';
 class FollowButton extends Component {
   state = {
     qcat: null,
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   },
   follow_button_text: {
     color: 'white',
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
   },
 });
 

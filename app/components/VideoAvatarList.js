@@ -6,13 +6,19 @@ import {
   StyleSheet,
   TouchableOpacity,
   ImageBackground,
+  Image,
   RefreshControl,
   Dimensions,
 } from 'react-native';
 import {RecyclerListView, DataProvider, LayoutProvider} from 'recyclerlistview';
 
+import Entypo from 'react-native-vector-icons/Entypo';
+import {DeleteIcon} from '../constants/icon';
+
 import * as RootNavigationRef from '../../RootNavigationRef';
-import {get_video_data} from '../functions/VideoFeedApi';
+import {get_video_data, delete_video} from '../functions/VideoFeedApi';
+import * as theme from '../constants/theme';
+
 const {width: winWidth, height: winHeight} = Dimensions.get('window');
 const HEIGHT = 200;
 const WIDTH = winWidth / 2 - 1;
@@ -27,14 +33,16 @@ let dataProvider = new DataProvider((r1, r2) => {
 });
 
 class SourceCard extends Component {
+  deletePost = video_info => {
+    this.props.deletePost && this.props.deletePost(video_info);
+  };
   render() {
-    const {video_info} = this.props;
+    const {video_info, isSelf} = this.props;
     return (
       <View
         style={{
-          height: HEIGHT - 15,
+          height: HEIGHT - 10,
           width: WIDTH - 10,
-          //   backgroundColor: '#DDD',
           borderRadius: 10,
           alignSelf: 'center',
           alignItems: 'center',
@@ -45,46 +53,82 @@ class SourceCard extends Component {
             width: 0,
             height: 3,
           },
-          shadowOpacity: 0.5,
+          shadowOpacity: 0.27,
           shadowRadius: 4.65,
 
-          elevation: 7,
+          elevation: 6,
         }}>
         <ImageBackground
           source={{uri: video_info.thumbnail_image}}
-          style={styles.avtar_image}>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'flex-end',
-            }}>
+          style={[styles.avtar_image, {height: HEIGHT - 50}]}>
+          <View style={{flex: 1, justifyContent: 'flex-end'}}>
             <View
               style={{
+                height: 35,
+                flexDirection: 'row',
+                justifyContent: 'space-evenly',
                 alignItems: 'center',
-                backgroundColor: 'rgba(255, 255, 255, 1.0)',
-                borderRadius: 10,
-                borderWidth: 1,
-                borderColor: 'black',
-                width: '100%',
               }}>
-              <Text
-                style={[
-                  styles.avatar_name,
-                  {textAlign: 'center', color: 'black'},
-                ]}
-                // adjustsFontSizeToFit={true}
-                numberOfLines={3}>
-                {video_info.title}
-              </Text>
+              <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+                <Entypo
+                  name="eye"
+                  size={25}
+                  color="white"
+                  style={{width: 30}}
+                />
+                <Text style={{color: 'white'}}>{video_info.views}</Text>
+              </View>
+              <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+                <Entypo
+                  name="share"
+                  size={25}
+                  color="white"
+                  style={{width: 30, marginLeft: 10}}
+                />
+                <Text style={{color: 'white'}}>{video_info.shared}</Text>
+              </View>
+              {isSelf && (
+                <DeleteIcon
+                  size={35}
+                  color="white"
+                  style={{
+                    marginLeft: 10,
+                  }}
+                  onPress={() => {
+                    this.deletePost(video_info);
+                  }}
+                />
+              )}
             </View>
           </View>
         </ImageBackground>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'white',
+            borderRadius: 0,
+            padding: 5,
+            width: '100%',
+            height: 50,
+            justifyContent: 'center',
+          }}>
+          <Text
+            style={[
+              styles.avatar_name,
+              {color: 'black', fontSize: 14, lineHeight: 15},
+            ]}
+            // adjustsFontSizeToFit={true}
+            numberOfLines={2}>
+            {video_info.title}
+          </Text>
+        </View>
+        {/* </ImageBackground> */}
       </View>
     );
   }
 }
 
-class TopicAvatarList extends Component {
+class VideoAvatarList extends Component {
   constructor(props) {
     super(props);
 
@@ -93,6 +137,7 @@ class TopicAvatarList extends Component {
       qid: null,
       searchText: null,
       feed_data: [],
+      isSelf: false,
     };
   }
   _layoutProvider = new LayoutProvider(
@@ -119,6 +164,17 @@ class TopicAvatarList extends Component {
     });
   };
 
+  deletePost = video_info => {
+    delete_video(video_info.id).then(response => {
+      if (response.status) {
+        const feed_data = this.state.feed_data.filter(
+          item => item.id !== response.id,
+        );
+        this.setState({feed_data: feed_data});
+      }
+    });
+  };
+
   render_avatar(type, data, index) {
     return (
       <View
@@ -129,7 +185,11 @@ class TopicAvatarList extends Component {
           onPress={() => {
             this.goToVideoFeed(index);
           }}>
-          <SourceCard video_info={data} />
+          <SourceCard
+            video_info={data}
+            isSelf={this.state.isSelf}
+            deletePost={this.deletePost}
+          />
         </TouchableOpacity>
       </View>
     );
@@ -139,7 +199,7 @@ class TopicAvatarList extends Component {
     if (!this.state.isProcessing && this.state.next_p !== null) {
       this.setState({isProcessing: true});
       const {qcat, qid, next_p, searchText} = this.state;
-      const query = searchText && searchText.length > 0 ? searchText : '';
+      const query = searchText !== null ? searchText : qid;
       await get_video_data(qcat, query, next_p).then(response => {
         this.setState({isProcessing: false});
         if (response.status) {
@@ -170,7 +230,11 @@ class TopicAvatarList extends Component {
   componentDidUpdate = () => {
     const {qcat, qid, searchText} = this.props;
     if (this.state.qcat != qcat || this.state.qid != qid) {
-      this.setState({qcat: qcat, qid: qid}, () => {
+      let isSelf = false;
+      if (qcat === 'user_post' && qid === this.props.user_id) {
+        isSelf = true;
+      }
+      this.setState({qcat: qcat, qid: qid, isSelf: isSelf}, () => {
         this.onRefresh();
       });
     } else if (
@@ -187,10 +251,10 @@ class TopicAvatarList extends Component {
   }
   render() {
     let {label, onScroll} = this.props;
-    const {feed_data} = this.state;
+    const {isSelf, feed_data} = this.state;
     return (
-      <View style={{flex: 1}}>
-        <Text style={styles.userLabel}>{label}</Text>
+      <View style={{flex: 1, backgroundColor: 'white'}}>
+        {label && <Text style={styles.userLabel}>{label}</Text>}
         {feed_data.length > 0 ? (
           <View style={{flex: 1}}>
             <RecyclerListView
@@ -198,6 +262,7 @@ class TopicAvatarList extends Component {
                 this._refRecyclerListView = c;
               }}
               onScroll={onScroll ? onScroll : null}
+              scrollThrottle={150}
               onEndReached={this.getVideoData}
               onEndReachedThreshold={2 * HEIGHT}
               layoutProvider={this._layoutProvider}
@@ -225,23 +290,30 @@ class TopicAvatarList extends Component {
 // define your styles
 const styles = StyleSheet.create({
   avtar_image: {
-    height: '100%',
+    // height: '100%',
     width: '100%',
     resizeMode: 'cover',
   },
   avatar_name: {
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
     fontWeight: 'bold',
   },
   userLabel: {
     fontSize: 18,
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
+    fontStyle: 'italic',
     paddingHorizontal: 5,
     alignSelf: 'stretch',
-    borderBottomColor: 'black',
-    borderBottomWidth: 1,
+    // textAlign: 'center',
   },
 });
 
 //make this component available to the app
-export default TopicAvatarList;
+import {connect} from 'react-redux';
+
+const mapStateToProps = state => ({
+  user_id: state.AuthReducer.user_id,
+});
+
+export default connect(mapStateToProps, {})(VideoAvatarList);
+// export default VideoAvatarList;

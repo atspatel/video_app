@@ -29,6 +29,10 @@ const sizes = {
   small: 8,
 };
 
+export const fontFamily = 'Calibri';
+// export const logoColor = '#FF644E';
+export const logoColor = '#ff634e';
+
 const fonts = {
   h1: {
     fontFamily: 'Rubik-Light',

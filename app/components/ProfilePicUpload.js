@@ -3,6 +3,8 @@ import React, {Component} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {Avatar, FAB} from 'react-native-paper';
 import ImagePicker from 'react-native-image-picker';
+
+import * as theme from '../constants/theme';
 // create a component
 class ProfilePicUpload extends Component {
   constructor(props) {
@@ -35,12 +37,19 @@ class ProfilePicUpload extends Component {
   }
   _render_avatar() {
     if (this.props.avatar.type == 'label') {
-      return <Avatar.Text size={150} label={this.props.avatar.label} />;
+      return (
+        <Avatar.Text
+          size={150}
+          label={this.props.avatar.label}
+          style={{backgroundColor: '#ffb7d1'}}
+        />
+      );
     } else if (this.props.avatar.type == 'image') {
       return (
         <Avatar.Image
           size={150}
           source={{uri: this.props.avatar.image_uri.uri}}
+          style={{backgroundColor: 'white'}}
         />
       );
     }
@@ -91,14 +100,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   fab_plus: {
-    backgroundColor: 'lightgreen',
+    backgroundColor: 'black',
     position: 'absolute',
     margin: 0,
     right: 0,
     bottom: 0,
   },
   fab_delete: {
-    backgroundColor: 'lightgreen',
+    backgroundColor: 'black',
     position: 'absolute',
     margin: 0,
     left: 0,

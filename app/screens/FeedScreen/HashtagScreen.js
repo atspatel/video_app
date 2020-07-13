@@ -7,6 +7,7 @@ import VideoThumbnailFeed from '../../components/VideoThumbnailFeed';
 import FollowButton from '../../components/FollowButton';
 
 import {get_follow, post_follow} from '../../functions/CreatorApi';
+import * as theme from '../../constants/theme';
 
 // create a component
 class HashtagScreen extends Component {
@@ -105,7 +106,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   title: {
-    fontFamily: 'serif',
+    fontFamily: theme.fontFamily,
     fontSize: 20,
     marginVertical: 5,
   },
